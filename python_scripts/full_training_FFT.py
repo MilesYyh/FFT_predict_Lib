@@ -13,7 +13,12 @@ for property_data in list_properties:
 	#dataset = "%s%s/training_dataset.csv" % (path_file, property_data)
 	dataset_training = "%s%s/training_dataset.csv" % (path_file, property_data)
 	dataset_testing = "%s%s/testing_dataset.csv" % (path_file, property_data)
-	path_response = "%s%s/" % (path_file, property_data)
+
+	#create dir path
+	command = "mkdir -p %s%s/meta_models/"  % (path_file, property_data)
+	os.system(command)
+
+	path_response = "%s%s/meta_models/" % (path_file, property_data)
 
 	command=""
 	if type_response == 1:#class

@@ -37,7 +37,7 @@ NOTE: The path to use must be the same used to save the results of prepare envir
 Example of use:
 
 ```
-python3 encoding_dataset_using_properties.py ../testing_data/enantioselectivity dataset_remove_nulls.csv ../testing_data/enantioselectivity/
+python3 encoding_dataset_using_properties.py ../testing_data/enantioselectivity/dataset_remove_nulls.csv ../testing_data/enantioselectivity/
 
 ```
 
@@ -93,10 +93,19 @@ python3 full_training_FFT.py ../testing_data/enantioselectivity/ 2
 
 ## 5. SELECTION MODELS USING STATISTICAL APPROACH
 
+The selection of the models is based on application of statistical techniques....
 
-## 6. CREATING META-MODEL USING SELECTED MODELS
+## 6. CREATING META-MODEL USING SELECTED MODELS AND EVALUATE PERFORMANCE
 
-## 7. EVALUATE PERFORMANCE META-MODEL USING VALIDATION DATASET
+For creating meta-models, depends of the type of response, you must use the scripts make_meta_model_XXX.py where XXX corresponding to class or regx, depend of the type of meta-model to build.
+
+The execution of these scripts is:
+
+```
+python3 make_meta_model_class.py path_to_datasets
+```
+
+The path_data is the same used previuosly
 
 ## RECOMENDATIONS
 
