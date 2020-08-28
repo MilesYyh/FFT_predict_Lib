@@ -60,6 +60,21 @@ python3 process_FFT_encoding.py ../testing_data/enantioselectivity/
 ```
 ## 3. PREPARE DATASET TO EXPLORATION MACHINE LEARNING METHODS
 
+To prepare datase for training process, you must apply the script prepare_dataset_to_train.py. This script split the dataset into two datasets: Training and Validation with the 80% and 20% of size, respectively. The division is randomly and is persistent for each property using during the process.
+
+Execution script:
+
+```
+python3 prepare_dataset_to_train.py path_to_Data_digitized number_examples
+```
+
+The dataset is the same previously used and the number of examples is a natural number.
+
+Example of use:
+
+```
+python3 prepare_dataset_to_train.py ../testing_data/enantioselectivity/ 152
+```
 ## 4. EXPLORING DATASET USING MACHINE LEARNING ALGORITHM
 
 ## 5. SELECTION MODELS USING STATISTICAL APPROACH
