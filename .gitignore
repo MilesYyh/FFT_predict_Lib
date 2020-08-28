@@ -1,0 +1,8 @@
+.idea/
+.nextflow*
+out*/
+work/
+other/
+FFT_predict_Lib-master
+
+*.pyc
