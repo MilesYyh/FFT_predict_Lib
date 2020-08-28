@@ -7,14 +7,17 @@
 Script to execute:
 
 
-```python3 prepare_environment.py dataset_input.csv path_output
+```
+python3 prepare_environment.py dataset_input.csv path_output
 ```
 
 NOTE: dataset_input.csv should be formatted with relative or absolute path
 
 Example of use:
 
-```python3 prepare_environment.py ../testing_data/enantioselectivity/enantioselectivity.csv ../testing_data/enantioselectivity/
+```
+python3 prepare_environment.py ../testing_data/enantioselectivity/enantioselectivity.csv ../testing_data/enantioselectivity/
+
 ```
 
 ## 2. ENCODING PROCESS
