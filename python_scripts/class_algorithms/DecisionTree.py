@@ -1,12 +1,3 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 from sklearn import tree
 from class_algorithms import responseTraining
 
@@ -19,16 +10,7 @@ class DecisionTree(object):
         self.splitter=splitter
         self.validation=validation
 
-    def trainingMethod(self, kindDataSet):
+    def trainingMethod(self):
         self.model=tree.DecisionTreeClassifier(criterion=self.criterion,splitter=self.splitter)
         self.DecisionTreeAlgorithm=self.model.fit(self.dataset,self.target)
 
-        if kindDataSet == 1:
-            params = "criterion:%s-splitter:%s" % (self.criterion,self.splitter)
-            self.performanceData = responseTraining.responseTraining(self.DecisionTreeAlgorithm, 'DecisionTree', params, self.validation)
-            self.performanceData.estimatedMetricsPerformance(self.dataset, self.target)
-
-        else:
-            params = "criterion:%s-splitter:%s" % (self.criterion,self.splitter)
-            self.performanceData = responseTraining.responseTraining(self.DecisionTreeAlgorithm, 'DecisionTree', params, self.validation)
-            self.performanceData.estimatedMetricsPerformanceMultilabels(self.dataset, self.target)

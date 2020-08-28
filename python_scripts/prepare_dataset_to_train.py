@@ -82,11 +82,17 @@ for property_value in list_propertyes:
 	dataset.to_csv(path_data+property_value+"/dataset_full.csv", index=False)
 	
 	matrix_dataset = []
-	for i in range(len(dataset_scaler)):
-		row = matrix_encoding[i]
-		row.append(response_data[i])
-		matrix_dataset.append(row)
+	#for i in range(len(dataset)):
+	#	row = matrix_encoding[i]
+	#	row.append(response_data[i])
+	#	matrix_dataset.append(row)
 
+	for i in range(len(dataset)):
+		row = []
+		for key in dataset.keys():
+			row.append(dataset[key][i])
+		matrix_dataset.append(row)
+		
 	#create two datasets: training and testing
 	matrix_dataset_training = []
 	matrix_dataset_testing = []

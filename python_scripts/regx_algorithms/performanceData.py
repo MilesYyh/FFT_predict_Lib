@@ -6,6 +6,7 @@ from scipy.stats import pearsonr
 from scipy.stats import spearmanr
 from scipy.stats import kendalltau
 import math
+from sklearn.metrics import r2_score
 
 class performancePrediction(object):
 
@@ -13,6 +14,10 @@ class performancePrediction(object):
 
         self.realValues = realValues
         self.predictValues = predictValues
+
+    def calculateR_score(self):
+
+        return r2_score(self.realValues, self.predictValues)
 
     #metodo que permite calcular el coeficiente de pearson...
     def calculatedPearson(self):

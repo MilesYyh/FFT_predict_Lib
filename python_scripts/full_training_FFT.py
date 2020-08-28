@@ -11,14 +11,15 @@ print("Process path: ", path_file)
 for property_data in list_properties:
 
 	#dataset = "%s%s/training_dataset.csv" % (path_file, property_data)
-	dataset = "%s%s/dataset_full.csv" % (path_file, property_data)
+	dataset_training = "%s%s/training_dataset.csv" % (path_file, property_data)
+	dataset_testing = "%s%s/testing_dataset.csv" % (path_file, property_data)
 	path_response = "%s%s/" % (path_file, property_data)
 
 	command=""
 	if type_response == 1:#class
-		command = "python training_class_models.py %s %s" % (dataset, path_response)
+		command = "python training_class_models.py %s %s" % (dataset_training, dataset_testing, path_response)
 	else:
-		command = "python training_regx_models.py %s %s" % (dataset, path_response)
+		command = "python training_regx_models.py %s %s" % (dataset_training, dataset_testing, path_response)
 
 	print(command)
 	os.system(command)

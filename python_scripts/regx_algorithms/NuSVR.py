@@ -1,19 +1,6 @@
-'''
-script que permite implementar support vector machine para regresiones o predicciones de valores
-a partir de set de datos de interes.
-'''
-
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 #modules import
 from sklearn.svm import NuSVR
+from sklearn.model_selection import cross_val_score
 
 class NuSVRModel(object):
 
@@ -32,6 +19,5 @@ class NuSVRModel(object):
     def trainingMethod(self):
 
         self.model=NuSVR(kernel=self.kernel, degree=self.degree, gamma=self.gamma, nu=self.nu)
-        self.SVRAlgorithm =self.model.fit(self.dataset,self.response)
-        self.predicctions = self.SVRAlgorithm.predict(self.dataset)
-        self.r_score = self.SVRAlgorithm.score(self.dataset, self.response)
+        self.model =self.model.fit(self.dataset,self.response)
+        cross_val_score(self.model, self.dataset, self.response, cv=10)

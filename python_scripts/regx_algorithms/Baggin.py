@@ -1,12 +1,4 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
+from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import BaggingRegressor
 
 class Baggin(object):
@@ -18,7 +10,9 @@ class Baggin(object):
         self.bootstrap = bootstrap
 
     def trainingMethod(self):
+        
         self.model= BaggingRegressor(n_estimators=self.n_estimators, bootstrap=self.bootstrap, n_jobs=-1)
-        self.bagginModel=self.model.fit(self.dataset,self.response)
-        self.predicctions = self.bagginModel.predict(self.dataset)
-        self.r_score = self.bagginModel.score(self.dataset, self.response)
+        self.model=self.model.fit(self.dataset,self.response)
+        cross_val_score(self.model, self.dataset, self.response, cv=10)
+
+        

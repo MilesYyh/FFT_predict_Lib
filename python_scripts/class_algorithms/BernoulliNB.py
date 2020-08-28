@@ -1,12 +1,3 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 from sklearn.naive_bayes import BernoulliNB
 from class_algorithms import responseTraining
 
@@ -17,15 +8,7 @@ class Bernoulli (object):
         self.target=target
         self.validation=validation
 
-    def trainingMethod(self, kindDataSet):
+    def trainingMethod(self):
         self.model=BernoulliNB()
         self.BernoulliNBAlgorithm=self.model.fit(self.dataset,self.target)
 
-        if kindDataSet ==1:#binary
-            params = "Param:Default"
-            self.performanceData = responseTraining.responseTraining(self.BernoulliNBAlgorithm, 'BernoulliNB', params, self.validation)
-            self.performanceData.estimatedMetricsPerformance(self.dataset, self.target)
-        else:
-            params = "Param:Default"
-            self.performanceData = responseTraining.responseTraining(self.BernoulliNBAlgorithm, 'BernoulliNB', params, self.validation)
-            self.performanceData.estimatedMetricsPerformanceMultilabels(self.dataset, self.target)

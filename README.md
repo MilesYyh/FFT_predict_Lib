@@ -77,7 +77,22 @@ python3 prepare_dataset_to_train.py ../testing_data/enantioselectivity/ 152
 ```
 ## 4. EXPLORING DATASET USING MACHINE LEARNING ALGORITHM
 
+This step allows exploring and selecting the best combinations of algorithms and hyperparameters based on machine learning algorithm and time series predictors algorithms. This step using two scripts: training_class_models.py for classification models and training_regx_models.py for predictivide models. 
+
+The general scripts is full_training_FFT.py, the execution of this algorithm is
+
+```
+python3 full_training_FFT.py path_to_datasets type_response
+```
+
+Example of use
+
+```
+python3 full_training_FFT.py ../testing_data/enantioselectivity/ 2
+```
+
 ## 5. SELECTION MODELS USING STATISTICAL APPROACH
+
 
 ## 6. CREATING META-MODEL USING SELECTED MODELS
 

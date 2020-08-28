@@ -1,12 +1,4 @@
 
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 #modules import
 from sklearn import svm
 from class_algorithms import responseTraining
@@ -26,15 +18,7 @@ class SVM(object):
         self.gamma = gamma
 
     #instance training...
-    def trainingMethod(self, kindDataSet):
+    def trainingMethod(self):
 
         self.model=svm.SVC(kernel=self.kernel, degree=self.degree, gamma=self.gamma, C=self.C_value, probability=True)
         self.SVMAlgorithm =self.model.fit(self.dataset,self.target)
-
-        params = "kernel:%s-C:%f-degree:%f-gamma:%f" % (self.kernel, self.C_value, self.degree, self.gamma)
-        self.performanceData = responseTraining.responseTraining(self.SVMAlgorithm, 'SVM', params, self.validation)
-
-        if kindDataSet == 1:
-            self.performanceData.estimatedMetricsPerformance(self.dataset, self.target)
-        else:
-            self.performanceData.estimatedMetricsPerformanceMultilabels(self.dataset, self.target)

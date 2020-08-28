@@ -1,12 +1,3 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 from sklearn.ensemble import AdaBoostClassifier
 from class_algorithms import responseTraining
 
@@ -19,17 +10,8 @@ class AdaBoost(object):
         self.algorithm=algorithm
         self.validation=validation
 
-    def trainingMethod(self, kindDataSet):
+    def trainingMethod(self):
 
         self.model= AdaBoostClassifier(n_estimators=self.n_estimators,algorithm=self.algorithm)
-        self.AdaBoostAlgorithm= self.model.fit(self.dataset,self.target)
-
-        if kindDataSet ==1:#binary
-            params = "algorithm:%s-n_estimators:%d" % (self.algorithm, self.n_estimators)
-            self.performanceData = responseTraining.responseTraining(self.AdaBoostAlgorithm, 'AdaBoost', params, self.validation)
-            self.performanceData.estimatedMetricsPerformance(self.dataset, self.target)
-        else:
-            params = "algorithm:%s-n_estimators:%d" % (self.algorithm, self.n_estimators)
-            self.performanceData = responseTraining.responseTraining(self.AdaBoostAlgorithm, 'AdaBoost', params, self.validation)
-            self.performanceData.estimatedMetricsPerformanceMultilabels(self.dataset, self.target)
+        self.model= self.model.fit(self.dataset,self.target)
             

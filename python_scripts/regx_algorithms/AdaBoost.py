@@ -1,12 +1,4 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
+from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import AdaBoostRegressor
 
 class AdaBoost(object):
@@ -19,6 +11,5 @@ class AdaBoost(object):
 
     def trainingMethod(self):
          self.model= AdaBoostRegressor(n_estimators=self.n_estimators,loss=self.loss)
-         self.AdaBoostModel=self.model.fit(self.dataset,self.response)
-         self.predicctions = self.AdaBoostModel.predict(self.dataset)
-         self.r_score = self.AdaBoostModel.score(self.dataset, self.response)
+         self.model=self.model.fit(self.dataset,self.response)
+         cross_val_score(self.model, self.dataset, self.response, cv=10)

@@ -1,13 +1,5 @@
-
-'''
-Author:
-mailto:
-Name Classs:
-Description:
-Dependences:
-'''
-
 #modules import
+from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
 
 class KNN_Model(object):
@@ -27,6 +19,5 @@ class KNN_Model(object):
     def trainingMethod(self):
 
         self.model = KNeighborsRegressor(n_neighbors=self.n_neighbors, weights=self.weights, algorithm=self.algorithm, metric=self.metric, n_jobs=-1)#instancia
-        self.KNN_model =self.model.fit(self.dataset,self.response)
-        self.predicctions = self.KNN_model.predict(self.dataset)
-        self.r_score = self.KNN_model.score(self.dataset, self.response)
+        self.model =self.model.fit(self.dataset,self.response)
+        cross_val_score(self.model, self.dataset, self.response, cv=10)

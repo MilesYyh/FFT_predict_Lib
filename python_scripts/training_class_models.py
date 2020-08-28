@@ -15,9 +15,22 @@ from class_algorithms import RandomForest
 from class_algorithms import SVM
 from class_algorithms import responseTraining
 from class_algorithms import summaryStatistic
+from class_algorithms import performance_model
 from joblib import dump, load
 import json
 import os
+
+def get_data_from_dataset(dataset):
+
+    matrix_data = []
+    for i in range(len(dataset)):
+        row = []
+        for key in dataset.keys():
+            if key != "response":
+                row.append(dataset[key][i])
+        matrix_data.append(row)
+
+    return matrix_data
 
 #funcion que permite calcular los estadisticos de un atributo en el set de datos, asociados a las medidas de desempeno
 def estimatedStatisticPerformance(summaryObject, attribute):
@@ -28,30 +41,15 @@ def estimatedStatisticPerformance(summaryObject, attribute):
     return row
 
 dataset_training = pd.read_csv(sys.argv[1])
-path_output = sys.argv[2]
+dataset_testing = pd.read_csv(sys.argv[2])
+path_output = sys.argv[3]
 
 #split into dataset and class
-class_data = dataset_training['response']
+response_training = dataset_training['response']
+response_testing = dataset_testing['response']
 
-matrix_dataset = []
-
-for i in range(len(dataset_training)):
-	row = []
-	for key in dataset_training.keys():
-		if key != "response":
-			row.append(dataset_training[key][i])
-	matrix_dataset.append(row)
-
-dataset_scaler = pd.DataFrame(matrix_dataset)
-
-#get kind dataset
-classArray = list(set(class_data))
-kindDataSet = 1
-
-if len(classArray) ==2:
-    kindDataSet =1
-else:
-    kindDataSet =2
+matrix_dataset = get_data_from_dataset(dataset_training)
+matrix_dataset_testing = get_data_from_dataset(dataset_testing)
 
 #explore algorithms and combinations of hyperparameters
 #generamos una lista con los valores obtenidos...
@@ -65,73 +63,95 @@ for algorithm in ['SAMME', 'SAMME.R']:
     for n_estimators in [10,100,1000]:
         try:
             print("Excec AdaBoost with ", algorithm, n_estimators)
-            AdaBoostObject = AdaBoost.AdaBoost(dataset_scaler, class_data, n_estimators, algorithm, 10)
-            AdaBoostObject.trainingMethod(kindDataSet)
+            AdaBoostObject = AdaBoost.AdaBoost(matrix_dataset, response_training, n_estimators, algorithm, 10)
+            AdaBoostObject.trainingMethod()
+
+            predictions = AdaBoostObject.model.predict(matrix_dataset_testing)
+
+            metrics = performance_model.performance_model(response_testing, predictions.tolist())
+            metrics.get_performance()
             params = "Algorithm:%s-n_estimators:%d" % (algorithm, n_estimators)
-            row = ["AdaBoostClassifier", params, "CV-10", AdaBoostObject.performanceData.scoreData[3], AdaBoostObject.performanceData.scoreData[4], AdaBoostObject.performanceData.scoreData[5], AdaBoostObject.performanceData.scoreData[6]]
+            row = ["AdaBoostClassifier", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
             matrixResponse.append(row)
             class_model_save.append(AdaBoostObject.model)
-            break
+
         except:                    
             pass
-    break
-        
 
 #Baggin
 for bootstrap in [True, False]:
     for n_estimators in [10,100, 1000]:
         try:
             print("Excec Bagging with ", bootstrap, n_estimators)
-            bagginObject = Baggin.Baggin(dataset_scaler,class_data,n_estimators, bootstrap,10)
-            bagginObject.trainingMethod(kindDataSet)
+            bagginObject = Baggin.Baggin(matrix_dataset,response_training,n_estimators, bootstrap,10)
+                
+            bagginObject.trainingMethod()
             params = "bootstrap:%s-n_estimators:%d" % (str(bootstrap), n_estimators)
-            row = ["Bagging", params, "CV-10", bagginObject.performanceData.scoreData[3], bagginObject.performanceData.scoreData[4], bagginObject.performanceData.scoreData[5], bagginObject.performanceData.scoreData[6]]
+
+            predictions = bagginObject.model.predict(matrix_dataset_testing)
+            metrics = performance_model.performance_model(response_testing, predictions.tolist())
+            metrics.get_performance()
+
+            row = ["Bagging", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
             matrixResponse.append(row)
+            print(row)
             class_model_save.append(bagginObject.model)
-            break
         except:
             pass
-    break
+
 
 #BernoulliNB
 try:
-    bernoulliNB = BernoulliNB.Bernoulli(dataset_scaler, class_data, 10)
-    bernoulliNB.trainingMethod(kindDataSet)
+    bernoulliNB = BernoulliNB.Bernoulli(matrix_dataset, response_training, 10)
+    bernoulliNB.trainingMethod()
     print("Excec Bernoulli Default Params")
+    
+    predictions = bernoulliNB.model.predict(matrix_dataset_testing)
+    metrics = performance_model.performance_model(response_testing, predictions.tolist())
+    metrics.get_performance()
+    
     params = "Default"
-    row = ["BernoulliNB", params, "CV-10", bernoulliNB.performanceData.scoreData[3], bernoulliNB.performanceData.scoreData[4], bernoulliNB.performanceData.scoreData[5], bernoulliNB.performanceData.scoreData[6]]
+    row = ["BernoulliNB", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
     matrixResponse.append(row)
     class_model_save.append(bernoulliNB.model)
+
 except:
     pass
-
 
 #DecisionTree
 for criterion in ['gini', 'entropy']:
     for splitter in ['best', 'random']:
         try:
             print("Excec DecisionTree with ", criterion, splitter)
-            decisionTreeObject = DecisionTree.DecisionTree(dataset_scaler, class_data, criterion, splitter,10)
-            decisionTreeObject.trainingMethod(kindDataSet)
+            decisionTreeObject = DecisionTree.DecisionTree(matrix_dataset, response_training, criterion, splitter,10)
+            decisionTreeObject.trainingMethod()
+
+            predictions = decisionTreeObject.model.predict(matrix_dataset_testing)
+            metrics = performance_model.performance_model(response_testing, predictions.tolist())
+            metrics.get_performance()
+
             params = "criterion:%s-splitter:%s" % (criterion, splitter)
-            row = ["DecisionTree", params, "CV-10", decisionTreeObject.performanceData.scoreData[3], decisionTreeObject.performanceData.scoreData[4], decisionTreeObject.performanceData.scoreData[5], decisionTreeObject.performanceData.scoreData[6]]
+            row = ["DecisionTree", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
             matrixResponse.append(row)
-            class_model_save.append(decisionTreeObject.model)
+            class_model_save.append(decisionTreeObject.model)            
         except:
             pass
         break
     break
-
 try:
     #GaussianNB
-    gaussianObject = GaussianNB.Gaussian(dataset_scaler, class_data, 10)
-    gaussianObject.trainingMethod(kindDataSet)
+    gaussianObject = GaussianNB.Gaussian(matrix_dataset, response_training, 10)
+    gaussianObject.trainingMethod()
     print("Excec GaussianNB Default Params")
     params = "Default"
-
-    row = ["GaussianNB", params, "CV-10", gaussianObject.performanceData.scoreData[3], gaussianObject.performanceData.scoreData[4], gaussianObject.performanceData.scoreData[5], gaussianObject.performanceData.scoreData[6]]
+    
+    predictions = gaussianObject.model.predict(matrix_dataset_testing)
+    metrics = performance_model.performance_model(response_testing, predictions.tolist())
+    metrics.get_performance()
+    
+    row = ["GaussianNB", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
     matrixResponse.append(row)
-    class_model_save.append(gaussianObject.model)
+    class_model_save.append(gaussianObject.model)    
 except:
     pass
 
@@ -140,18 +160,21 @@ for loss in ['deviance', 'exponential']:
     for n_estimators in [10, 100, 1000]:
         try:
             print ("Excec GradientBoostingClassifier with ", loss, n_estimators, 2, 1)
-            gradientObject = Gradient.Gradient(dataset_scaler,class_data,n_estimators, loss, 2, 1, 10)
-            gradientObject.trainingMethod(kindDataSet)
+            gradientObject = Gradient.Gradient(matrix_dataset,response_training,n_estimators, loss, 2, 1, 10)
+            gradientObject.trainingMethod()
             params = "n_estimators:%d-loss:%s-min_samples_split:%d-min_samples_leaf:%d" % (n_estimators, loss, 2, 1)
-            row = ["GradientBoostingClassifier", params, "CV-10", gradientObject.performanceData.scoreData[3], gradientObject.performanceData.scoreData[4], gradientObject.performanceData.scoreData[5], gradientObject.performanceData.scoreData[6]]
+            
+            predictions = gradientObject.model.predict(matrix_dataset_testing)
+            metrics = performance_model.performance_model(response_testing, predictions.tolist())
+            metrics.get_performance()
+            row = ["GradientBoostingClassifier", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
             matrixResponse.append(row)
-            class_model_save.append(gradientObject.model)            
+            class_model_save.append(gradientObject.model)                        
         except:
             pass
 
         break
     break
-
 #knn
 for n_neighbors in range(2,11):
     for algorithm in ['auto', 'ball_tree', 'kd_tree', 'brute']:
@@ -159,13 +182,18 @@ for n_neighbors in range(2,11):
             for weights in ['uniform', 'distance']:
                 try:
                     print("Excec KNeighborsClassifier with ", n_neighbors, algorithm, metric, weights)
-                    knnObect = knn.knn(dataset_scaler, class_data, n_neighbors, algorithm, metric,  weights,10)
-                    knnObect.trainingMethod(kindDataSet)
+                    knnObect = knn.knn(matrix_dataset, response_training, n_neighbors, algorithm, metric,  weights,10)
+                    knnObect.trainingMethod()
+
+                    predictions = knnObect.model.predict(matrix_dataset_testing)
+                    metrics = performance_model.performance_model(response_testing, predictions.tolist())
+                    metrics.get_performance()
 
                     params = "n_neighbors:%d-algorithm:%s-metric:%s-weights:%s" % (n_neighbors, algorithm, metric, weights)
-                    row = ["KNeighborsClassifier", params, "CV-10", knnObect.performanceData.scoreData[3], knnObect.performanceData.scoreData[4], knnObect.performanceData.scoreData[5], knnObect.performanceData.scoreData[6]]
+                    row = ["KNeighborsClassifier", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
                     matrixResponse.append(row)
                     class_model_save.append(knnObect.model)
+                
                 except:
                     pass
                 break
@@ -179,35 +207,47 @@ for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
         for degree in range(3, 15):
             try:
                 print("Excec NuSVM")
-                nuSVM = NuSVM.NuSVM(dataset_scaler, class_data, kernel, nu, degree, 0.01, 10)
-                nuSVM.trainingMethod(kindDataSet)
+                nuSVM = NuSVM.NuSVM(matrix_dataset, response_training, kernel, nu, degree, 0.01, 10)
+                nuSVM.trainingMethod()
+
+                predictions = nuSVM.model.predict(matrix_dataset_testing)
+                metrics = performance_model.performance_model(response_testing, predictions.tolist())
+                metrics.get_performance()
+
                 params = "kernel:%s-nu:%f-degree:%d-gamma:%f" % (kernel, nu, degree, 0.01)
-                row = ["NuSVM", params, "CV-10", nuSVM.performanceData.scoreData[3], nuSVM.performanceData.scoreData[4], nuSVM.performanceData.scoreData[5], nuSVM.performanceData.scoreData[6]]
+                row = ["NuSVM", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
                 matrixResponse.append(row)
                 class_model_save.append(nuSVM.model)
+
             except:
                 pass
             break
         break
     break
-
 #SVC
 for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
     for C_value in [0.01, 0.05, 0.1]:
         for degree in range(3, 15):
             try:
                 print ("Excec SVM")
-                svm = SVM.SVM(dataset_scaler, class_data, kernel, C_value, degree, 0.01, 10)
-                svm.trainingMethod(kindDataSet)
+                svm = SVM.SVM(matrix_dataset, response_training, kernel, C_value, degree, 0.01, 10)
+                svm.trainingMethod()
+
+                predictions = svm.model.predict(matrix_dataset_testing)
+                metrics = performance_model.performance_model(response_testing, predictions.tolist())
+                metrics.get_performance()
+
                 params = "kernel:%s-c:%f-degree:%d-gamma:%f" % (kernel, C_value, degree, 0.01)
-                row = ["SVM", params, "CV-10", svm.performanceData.scoreData[3], svm.performanceData.scoreData[4], svm.performanceData.scoreData[5], svm.performanceData.scoreData[6]]
+                row = ["SVM", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
                 matrixResponse.append(row)
                 class_model_save.append(svm.model)                       	
+
             except:
                 pass
             break
         break
     break
+
 
 #RF
 for n_estimators in [10,100,1000]:
@@ -215,18 +255,19 @@ for n_estimators in [10,100,1000]:
         for bootstrap in [True, False]:
             try:
                 print ("Excec RF")
-                rf = RandomForest.RandomForest(dataset_scaler, class_data, n_estimators, criterion, 2, 1, bootstrap, 10)
-                rf.trainingMethod(kindDataSet)
+                rf = RandomForest.RandomForest(matrix_dataset, response_training, n_estimators, criterion, 2, 1, bootstrap, 10)
+                rf.trainingMethod()
+
+                predictions = rf.model.predict(matrix_dataset_testing)
+                metrics = performance_model.performance_model(response_testing, predictions.tolist())
+                metrics.get_performance()
 
                 params = "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s" % (n_estimators, criterion, 2, 1, str(bootstrap))
-                row = ["RandomForestClassifier", params, "CV-10", rf.performanceData.scoreData[3], rf.performanceData.scoreData[4], rf.performanceData.scoreData[5], rf.performanceData.scoreData[6]]
+                row = ["RandomForestClassifier", params, "CV-10", metrics.accuracy_value, metrics.recall_value, metrics.precision_value, metrics.f1_value]
                 matrixResponse.append(row)
-                class_model_save.append(rf.model)
+                class_model_save.append(rf.model)                
             except:
                 pass
-            break
-        break
-    break
 
 #generamos el export de la matriz convirtiendo a data frame
 dataFrameResponse = pd.DataFrame(matrixResponse, columns=header)
