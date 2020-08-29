@@ -63,9 +63,7 @@ def main():
     for i in range(len(dataset)):
         row_data = []
         # get sequence encoding with PCA Analysis
-        sequence_encoding = encoding_pca_data(
-            dataset["sequence"][i], property_dataset
-        )
+        sequence_encoding = encoding_pca_data(dataset["sequence"][i], property_dataset)
         row_data.append(sequence_encoding)
         row_data.append(dataset["response"][i])
 
@@ -122,8 +120,10 @@ def parse_arguments():
     @return: arguments parser
     """
 
-    parser = argparse.ArgumentParser("Encode dataset file using the 8 meta-properties and produce two files "
-                                     "'encoding_with_class.csv' and 'encoding_without_class.csv'")
+    parser = argparse.ArgumentParser(
+        "Encode dataset file using the 8 meta-properties and produce two files "
+        "'encoding_with_class.csv' and 'encoding_without_class.csv'"
+    )
 
     parser.add_argument(
         "-i",

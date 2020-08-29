@@ -24,18 +24,6 @@ process prepare_dataset {
   """
 }
 
-process evn  {
-  echo true
-  publishDir "${params.output_dir}/", mode:"copy"
-
-  output:
-  path "env.txt"
-
-  script:
-  """
-  printenv > env.txt
-  """
-}
 
 process encode_dataset_by_properties {
   tag "${encode}"
@@ -47,9 +35,8 @@ process encode_dataset_by_properties {
   path dataset from dataset_no_nulls_ch
 
   output:
-  path "encoding_with_class.csv"
+  tuple val(encode), path("encoding_with_class.csv"), path("${fft_path}") into encoded_dataset_ch
   path "encoding_without_class.csv"
-  path "${fft_path}"
   path "${domain_path}"
 
   script:
@@ -61,5 +48,23 @@ process encode_dataset_by_properties {
   
   matlab nodisplay -nosplash -nodesktop -r \
   "addpath('${params.bin}') ;procesFourierTransform('encoding_with_class.csv', '${fft_path}', '${domain_path}'); exit;"
+  """
+}
+
+
+process split_encoded_dataset {
+  tag "${encode}"
+  publishDir "${params.output_dir}/3-dataset_for_exploration/${encode}/", mode:"copy"
+  
+  input:
+  tuple val(encode), path(dataset_class), path(dataset_fft) from encoded_dataset_ch
+
+  output:
+  path "*"
+
+
+  script:
+  """
+  prepare_dataset_to_train.py -i1 $dataset_class -i2 $dataset_fft -e $encode -o . -s 100
   """
 }

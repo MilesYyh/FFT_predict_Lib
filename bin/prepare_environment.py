@@ -38,9 +38,7 @@ def parse_arguments():
     @return: arguments parser
     """
 
-    parser = argparse.ArgumentParser(
-        "Prepare dataset for pipeline"
-    )
+    parser = argparse.ArgumentParser("Prepare dataset for pipeline")
 
     parser.add_argument(
         "-i",
@@ -61,5 +59,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
