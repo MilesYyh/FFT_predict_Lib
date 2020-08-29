@@ -2,21 +2,64 @@ println "----------Running FFT Peptide Predictor Pipeline----------"
 
 
 /*
-* Files
+* Files and channels
 */
 
 dataset_file = file(params.dataset_path)
+encoding_index_ch = Channel.fromPath(params.encoding_index_dir)
 
 
 process prepare_dataset {
+  publishDir "${params.output_dir}/1-prepare_dataset", mode:"copy"
+
   input:
-  file dataset_file
+  path dataset_file
 
   output:
-  path "${dataset_file.simpleName}_no_nulls.csv" into dataset_no_nulls_ch
+  path "${dataset_file.simpleName}.no_nulls.csv" into dataset_no_nulls_ch
 
   script:
   """
-  prepare_environment.py -i $dataset_file -o ${dataset_file.simpleName}_no_nulls.csv
+  prepare_environment.py -i $dataset_file -o ${dataset_file.simpleName}.no_nulls.csv
+  """
+}
+
+process evn  {
+  echo true
+  publishDir "${params.output_dir}/", mode:"copy"
+
+  output:
+  path "env.txt"
+
+  script:
+  """
+  printenv > env.txt
+  """
+}
+
+process encode_dataset_by_properties {
+  tag "${encode}"
+  publishDir "${params.output_dir}/2-encode_dataset/${encode}/", mode:"copy"
+  
+
+  input:
+  each path(encoding_file) from encoding_index_ch
+  path dataset from dataset_no_nulls_ch
+
+  output:
+  path "encoding_with_class.csv"
+  path "encoding_without_class.csv"
+  path "${fft_path}"
+  path "${domain_path}"
+
+  script:
+  encode = encoding_file.simpleName
+  fft_path="encoding_data_FFT.csv"
+  domain_path="domain_data.csv"
+  """
+  encoding_dataset_using_properties.py -i $dataset -o . -e $encoding_file
+  
+  matlab nodisplay -nosplash -nodesktop -r \
+  "addpath('${params.bin}') ;procesFourierTransform('encoding_with_class.csv', '${fft_path}', '${domain_path}'); exit;"
   """
 }

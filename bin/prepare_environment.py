@@ -33,7 +33,7 @@ def main():
 
 def parse_arguments():
     """
-    Prepare dataset for pipeline
+    Parse input arguments of script
 
     @return: arguments parser
     """
