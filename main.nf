@@ -52,19 +52,43 @@ process encode_dataset_by_properties {
 }
 
 
+//TODO FIX SIZE OF DATASET
 process split_encoded_dataset {
   tag "${encode}"
-  publishDir "${params.output_dir}/3-dataset_for_exploration/${encode}/", mode:"copy"
+  publishDir "${params.output_dir}/3-datasets_for_exploration/${encode}/", mode:"copy"
   
   input:
   tuple val(encode), path(dataset_class), path(dataset_fft) from encoded_dataset_ch
 
   output:
-  path "*"
+  path "dataset_full.csv"
+  tuple val(encode), path("training_dataset.csv"), path("testing_dataset.csv") into exploration_dataset_ch, exploration_dataset_ch2
 
 
   script:
   """
   prepare_dataset_to_train.py -i1 $dataset_class -i2 $dataset_fft -e $encode -o . -s 100
+  """
+}
+
+
+process training_dataset {
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/", mode:"copy"
+  tag "${encode}"
+
+  input:
+  tuple val(encode), path(training_dataset), path(testing_dataset) from exploration_dataset_ch 
+
+  output:
+  path "*"
+
+  script:
+  """
+  if [[ ${params.mode} == "classification" ]]; then
+    training_class_models.py -i1 $training_dataset -i2 $testing_dataset -o .
+
+  elif [[ ${params.mode} == "regression" ]]; then
+    echo "regression"
+  fi
   """
 }

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import pandas as pd
 import random
 import argparse
@@ -47,6 +46,7 @@ def get_response_from_dataset(name_doc):
     return response_array
 
 
+# TODO rework this script
 def main():
 
     args = parse_arguments()
@@ -167,6 +167,14 @@ def parse_arguments():
         required=True,
         type=int,
         help="Int number with the number of examples to use from the encoded dataset",
+    )
+
+    parser.add_argument(
+        "-m",
+        "--mode",
+        action="store",
+        choices=['regression', 'classification'],
+        help="Type of dataset {regression|classification}",
     )
 
     parser.add_argument(

@@ -5,4 +5,6 @@ work/
 other/
 FFT_predict_Lib-master
 
-*.pyc
+*.py[cod]
+__pycache__/
+test*/
