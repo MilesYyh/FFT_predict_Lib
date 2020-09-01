@@ -34,7 +34,7 @@ def main():
         pass
 
     # Save full dataset
-    dataset.to_csv(path.join(args.output, "dataset_full.alt.csv"), index=False, float_format='%.5f')
+    dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=False, float_format='%.5f')
 
     # Random sample the dataset
     sample_dataset = dataset.sample(frac=sample_fraction, axis=0, random_state=RandomState(13))
@@ -47,8 +47,8 @@ def main():
     testing_df = pd.concat([x_test, y_test], axis=1)
 
     # Save datasets
-    training_df.to_csv(path.join(args.output, "training_dataset.alt.csv"), index=False, float_format='%.5f')
-    testing_df.to_csv(path.join(args.output, "testing_dataset.alt.csv"), index=False, float_format='%.5f')
+    training_df.to_csv(path.join(args.output, "training_dataset.csv"), index=False, float_format='%.5f')
+    testing_df.to_csv(path.join(args.output, "testing_dataset.csv"), index=False, float_format='%.5f')
 
 
 def parse_arguments():
