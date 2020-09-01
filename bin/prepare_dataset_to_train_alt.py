@@ -27,11 +27,16 @@ def main():
     dataset.columns = [f"P_{i+1}" for i in range(len(dataset.columns))]
 
     response_data = pd.read_csv(encode_dataset, header=None, sep=',').iloc[:, -1]
-    dataset['response'] = response_data
 
-    # TODO fix classes with label encoder in classification
     if args.mode == 'classification':
-        pass
+        # Transform string labels to int
+        le = preprocessing.LabelEncoder()
+        le.fit(response_data)
+        response_encoded = le.transform(response_data)
+        dataset['response'] = response_encoded
+
+    elif args.mode == 'regression':
+        dataset['response'] = response_data
 
     # Save full dataset
     dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=False, float_format='%.5f')

@@ -61,11 +61,10 @@ process split_encoded_dataset {
   output:
   path "dataset_full.csv"
   tuple val(encode), path("training_dataset.csv"), path("testing_dataset.csv") into exploration_dataset_ch, exploration_dataset_ch2
-  path "*"
 
   script:
   """
-  prepare_dataset_to_train.py -i1 $dataset_class -i2 $dataset_fft -e $encode -o . -s 100
+  prepare_dataset_to_train_alt.py -i1 $dataset_class -i2 $dataset_fft -o . -s 0.5 -m ${params.mode}
   """
 }
 
