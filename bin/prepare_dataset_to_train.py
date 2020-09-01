@@ -4,6 +4,8 @@ import pandas as pd
 import random
 import argparse
 from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from numpy.random import RandomState
 from os import path
 
 
@@ -81,6 +83,38 @@ def main():
     # scale dataset
     min_max_scaler = preprocessing.MinMaxScaler()
     dataset_scaler = min_max_scaler.fit_transform(matrix_encoding)
+
+    ##################
+    # Load data
+    matrix_encoding_alt = pd.read_csv(name_doc_FFT, sep=',', header=None)
+    matrix_encoding_alt_scaled = min_max_scaler.fit_transform(matrix_encoding_alt)
+
+    dataset_alt = pd.DataFrame(matrix_encoding_alt_scaled)
+    dataset_alt.columns = [f"P_{i+1}" for i in range(len(dataset_alt.columns))]
+
+    response_data_alt = pd.read_csv(name_doc_response, header=None, sep=',').iloc[:, -1]
+    dataset_alt['response'] = response_data_alt
+
+    #TODO fix classes with label encoder in classification
+
+    # Save full dataset
+    dataset_alt.to_csv(path.join(args.output, "dataset_full.alt.csv"), index=False, float_format='%.5f')
+
+    # Random sample the dataset
+    sample_dataset = dataset_alt.sample(frac=0.5, axis=0, random_state=RandomState(13))
+    labels = sample_dataset['response']
+    data = sample_dataset.drop(['response'], axis=1)
+
+    # Split random sample into testing and training datasets
+    x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2)
+    training_df = pd.concat([x_train, y_train], axis=1)
+    testing_df = pd.concat([x_test, y_test], axis=1)
+
+    # Save datasets
+    training_df.to_csv(path.join(args.output, "training_dataset.alt.csv"), index=False, float_format='%.5f')
+    testing_df.to_csv(path.join(args.output, "testing_dataset.alt.csv"), index=False, float_format='%.5f')
+
+    ####################
 
     dataset = pd.DataFrame(dataset_scaler, columns=header)
     dataset["response"] = response_data

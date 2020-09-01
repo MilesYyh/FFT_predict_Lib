@@ -51,8 +51,6 @@ process encode_dataset_by_properties {
   """
 }
 
-
-//TODO FIX SIZE OF DATASET
 process split_encoded_dataset {
   tag "${encode}"
   publishDir "${params.output_dir}/3-datasets_for_exploration/${encode}/", mode:"copy"
@@ -63,7 +61,7 @@ process split_encoded_dataset {
   output:
   path "dataset_full.csv"
   tuple val(encode), path("training_dataset.csv"), path("testing_dataset.csv") into exploration_dataset_ch, exploration_dataset_ch2
-
+  path "*"
 
   script:
   """
@@ -88,7 +86,7 @@ process training_dataset {
     training_class_models.py -i1 $training_dataset -i2 $testing_dataset -o .
 
   elif [[ ${params.mode} == "regression" ]]; then
-    echo "regression"
+    training_regx_models.py -i1 $training_dataset -i2 $testing_dataset -o .
   fi
   """
 }
