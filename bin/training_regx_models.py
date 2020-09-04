@@ -37,32 +37,20 @@ def estimatedStatisticPerformance(summaryObject, attribute):
     return row
 
 
-def get_data_from_dataset(dataset):
-
-    matrix_data = []
-    for i in range(len(dataset)):
-        row = []
-        for key in dataset.keys():
-            if key != "response":
-                row.append(dataset[key][i])
-        matrix_data.append(row)
-
-    return matrix_data
-
-
 def main():
-    # TODO remove index when load dataset
+    # TODO check script is working correct
     args = parse_arguments()
-    dataset_training = pd.read_csv(args.input_1)
-    dataset_testing = pd.read_csv(args.input_2)
+
+    dataset_training = pd.read_csv(args.input_1, index_col=0)
+    dataset_testing = pd.read_csv(args.input_2, index_col=0)
     path_output = args.output
 
     # split into dataset and class
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset = get_data_from_dataset(dataset_training)
-    matrix_dataset_testing = get_data_from_dataset(dataset_testing)
+    matrix_dataset = dataset_training.drop('response', axis=1)
+    matrix_dataset_testing = dataset_testing.drop('response', axis=1)
 
     # generamos una lista con los valores obtenidos...
     header = ["Algorithm", "Params", "R_Score", "Pearson", "Spearman", "Kendalltau"]
@@ -102,8 +90,9 @@ def main():
                 ]
                 matrixResponse.append(row)
                 regx_model_save.append(AdaBoostObject.model)
-            except:
 
+            except Exception as e:
+                print('error ada', e)
                 pass
 
     # Baggin
@@ -136,7 +125,9 @@ def main():
                 print(row)
                 matrixResponse.append(row)
                 regx_model_save.append(bagginObject.model)
-            except:
+
+            except Exception as e:
+                print('error baggin', e)
                 pass
 
     # DecisionTree
@@ -173,7 +164,9 @@ def main():
                 print(row)
                 matrixResponse.append(row)
                 regx_model_save.append(decisionTreeObject.model)
-            except:
+
+            except Exception as e:
+                print('error tree', e)
                 pass
 
     # gradiente
@@ -219,7 +212,8 @@ def main():
                     matrixResponse.append(row)
                     regx_model_save.append(gradientObject.model)
 
-                except:
+                except Exception as e:
+                    print('error gradiente', e)
                     pass
 
     # knn
@@ -274,7 +268,9 @@ def main():
                         print(row)
                         matrixResponse.append(row)
                         regx_model_save.append(knnObect.model)
-                    except:
+
+                    except Exception as e:
+                        print('error knn', e)
                         pass
 
     # NuSVR
@@ -313,9 +309,10 @@ def main():
                     ]
                     matrixResponse.append(row)
                     regx_model_save.append(nuSVM.model)
-                except:
-                    pass
 
+                except Exception as e:
+                    print('error nusvr', e)
+                    pass
 
     # SVC
     for kernel in ["rbf", "linear", "poly", "sigmoid", "precomputed"]:
@@ -348,55 +345,55 @@ def main():
 
                 regx_model_save.append(svm.model)
 
-            except:
+            except Exception as e:
+                print('error svc', e)
                 pass
 
     # RF
     for n_estimators in [10, 100, 1000]:
         for criterion in ["mse", "mae"]:
             for bootstrap in [True, False]:
-                # try:
-                print("Excec RF")
-                rf = RandomForest.RandomForest(
-                    matrix_dataset,
-                    response_training,
-                    n_estimators,
-                    criterion,
-                    2,
-                    1,
-                    bootstrap,
-                )
-                rf.trainingMethod()
+                try:
+                    print("Excec RF")
+                    rf = RandomForest.RandomForest(
+                        matrix_dataset,
+                        response_training,
+                        n_estimators,
+                        criterion,
+                        2,
+                        1,
+                        bootstrap,
+                    )
+                    rf.trainingMethod()
 
-                predictions_data = rf.model.predict(matrix_dataset_testing)
-                performanceValues = performanceData.performancePrediction(
-                    response_testing, predictions_data.tolist()
-                )
-                pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
-                spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
-                kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                r_score_value = performanceValues.calculateR_score()
+                    predictions_data = rf.model.predict(matrix_dataset_testing)
+                    performanceValues = performanceData.performancePrediction(
+                        response_testing, predictions_data.tolist()
+                    )
+                    pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
+                    spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
+                    kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
+                    r_score_value = performanceValues.calculateR_score()
 
-                params = (
-                    "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s"
-                    % (n_estimators, criterion, 2, 1, str(bootstrap))
-                )
-                row = [
-                    "RandomForestRegressor",
-                    params,
-                    r_score_value,
-                    pearsonValue,
-                    spearmanValue,
-                    kendalltauValue,
-                ]
-                matrixResponse.append(row)
-                print(row)
-                regx_model_save.append(rf.model)
-                break
-            break
-        break
-        # except:
-        #    pass
+                    params = (
+                        "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s"
+                        % (n_estimators, criterion, 2, 1, str(bootstrap))
+                    )
+                    row = [
+                        "RandomForestRegressor",
+                        params,
+                        r_score_value,
+                        pearsonValue,
+                        spearmanValue,
+                        kendalltauValue,
+                    ]
+                    matrixResponse.append(row)
+                    print(row)
+                    regx_model_save.append(rf.model)
+
+                except Exception as e:
+                    print('error rf', e)
+                    pass
 
     matrixResponseRemove = []
     for element in matrixResponse:
@@ -413,17 +410,10 @@ def main():
     # estimamos los estadisticos resumenes para cada columna en el header
     # instanciamos el object
     statisticObject = summaryStatistic.createStatisticSummary(nameFileExport)
-    matrixSummaryStatistic = []
-
-    # "Pearson", "Spearman", "Kendalltau"
-    matrixSummaryStatistic.append(estimatedStatisticPerformance(statisticObject, "R_Score"))
-    matrixSummaryStatistic.append(estimatedStatisticPerformance(statisticObject, "Pearson"))
-    matrixSummaryStatistic.append(
-        estimatedStatisticPerformance(statisticObject, "Spearman")
-    )
-    matrixSummaryStatistic.append(
-        estimatedStatisticPerformance(statisticObject, "Kendalltau")
-    )
+    matrixSummaryStatistic = [estimatedStatisticPerformance(statisticObject, "R_Score"),
+                              estimatedStatisticPerformance(statisticObject, "Pearson"),
+                              estimatedStatisticPerformance(statisticObject, "Spearman"),
+                              estimatedStatisticPerformance(statisticObject, "Kendalltau")]
 
     # generamos el nombre del archivo
     dataFrame = pd.DataFrame(
@@ -443,8 +433,8 @@ def main():
     # get max value for each performance
     for i in range(len(dataFrame)):
 
-        max_value = dataFrame["MAX"][i]
-        performance = dataFrame["Performance"][i]
+        max_value = dataFrame['MAX'][i]
+        performance = dataFrame['Performance'][i]
 
         print("MAX ", max_value, "Performance: ", performance)
         information_model = {}
@@ -457,24 +447,25 @@ def main():
         model_matrix = []
         algorithm_data = []
 
-        for i in range(len(dataFrameResponse)):
-            if dataFrameResponse[performance][i] == max_value:
-                model_matrix.append(regx_model_save[i])
-                algorithm_data.append(dataFrameResponse["Algorithm"][i])
-                information_matrix.append(dataFrameResponse["Params"][i])
+        for j in range(len(dataFrameResponse)):
+            difference_performance = abs(max_value - dataFrameResponse[performance][j])
+            if difference_performance <= 0.000001:
+                model_matrix.append(regx_model_save[j])
+                algorithm_data.append(dataFrameResponse['Algorithm'][j])
+                information_matrix.append(dataFrameResponse['Params'][j])
 
         array_summary = []
 
-        for i in range(len(information_matrix)):
-            model_data = {"algorithm": algorithm_data[i], "params": information_matrix[i]}
+        for j in range(len(information_matrix)):
+            model_data = {'algorithm': algorithm_data[j], 'params': information_matrix[j]}
             array_summary.append(model_data)
 
         information_model.update({"models": array_summary})
 
         # export models
-        for i in range(len(model_matrix)):
-            name_model = path.join(path_output, f"meta_models/{performance}_model{str(i)}.joblib")
-            dump(model_matrix[i], name_model)
+        for j in range(len(model_matrix)):
+            name_model = path.join(path_output, f"meta_models/{performance}_model{str(j)}.joblib")
+            dump(model_matrix[j], name_model)
 
         dict_summary_meta_model.update({performance: information_model})
 

@@ -477,7 +477,9 @@ def main():
         algorithm_data = []
 
         for j in range(len(dataFrameResponse)):
-            if dataFrameResponse[performance][j] == max_value:
+            print("Performance model: ", dataFrameResponse[performance][j])
+            difference_performance = abs(max_value - dataFrameResponse[performance][j])
+            if difference_performance <= 0.000001:
                 model_matrix.append(class_model_save[j])
                 algorithm_data.append(dataFrameResponse['Algorithm'][j])
                 information_matrix.append(dataFrameResponse['Params'][j])
