@@ -55,7 +55,7 @@ matrixResponse = []
 regx_model_save = []
 
 #comenzamos con las ejecuciones...
-
+'''
 #AdaBoost
 for loss in ['linear', 'squar', 'exponential']:
     for n_estimators in [10, 100, 1000]:
@@ -226,7 +226,7 @@ for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
         except:
             pass
 
-
+'''
 #RF
 for n_estimators in [10,100, 1000]:
     for criterion in ['mse', 'mae']:
@@ -306,24 +306,24 @@ for i in range(len(dataFrame)):
     model_matrix = []
     algorithm_data = []
 
-    for i in range(len(dataFrameResponse)):
-        if dataFrameResponse[performance][i] == max_value:
-            model_matrix.append(regx_model_save[i])
-            algorithm_data.append(dataFrameResponse['Algorithm'][i])
-            information_matrix.append(dataFrameResponse['Params'][i])
+    for j in range(len(dataFrameResponse)):        
+        if dataFrameResponse[performance][j] == max_value:
+            model_matrix.append(regx_model_save[j])
+            algorithm_data.append(dataFrameResponse['Algorithm'][j])
+            information_matrix.append(dataFrameResponse['Params'][j])
 
     array_summary = []
 
-    for i in range(len(information_matrix)):
-        model_data = {'algorithm': algorithm_data[i], 'params':information_matrix[i]}
+    for j in range(len(information_matrix)):
+        model_data = {'algorithm': algorithm_data[j], 'params':information_matrix[j]}
         array_summary.append(model_data)
 
     information_model.update({"models":array_summary})
 
     #export models
-    for i in range(len(model_matrix)):
-        name_model = path_output+"meta_models/"+performance+"_model"+str(i)+".joblib"
-        dump(model_matrix[i], name_model)
+    for j in range(len(model_matrix)):
+        name_model = path_output+"meta_models/"+performance+"_model"+str(j)+".joblib"
+        dump(model_matrix[j], name_model)
 
     dict_summary_meta_model.update({performance:information_model})
 

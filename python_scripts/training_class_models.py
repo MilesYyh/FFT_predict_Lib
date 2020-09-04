@@ -58,6 +58,7 @@ matrixResponse = []
 
 class_model_save = []
 
+'''
 #AdaBoost
 for algorithm in ['SAMME', 'SAMME.R']:
     for n_estimators in [10,100,1000]:
@@ -248,7 +249,7 @@ for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
         break
     break
 
-
+'''
 #RF
 for n_estimators in [10,100,1000]:
     for criterion in ['gini', 'entropy']:
@@ -268,6 +269,9 @@ for n_estimators in [10,100,1000]:
                 class_model_save.append(rf.model)                
             except:
                 pass
+            break
+        break
+    break
 
 #generamos el export de la matriz convirtiendo a data frame
 dataFrameResponse = pd.DataFrame(matrixResponse, columns=header)
@@ -315,24 +319,24 @@ for i in range(len(dataFrame)):
     model_matrix = []
     algorithm_data = []
 
-    for i in range(len(dataFrameResponse)):
-        if dataFrameResponse[performance][i] == max_value:
-            model_matrix.append(class_model_save[i])
-            algorithm_data.append(dataFrameResponse['Algorithm'][i])
-            information_matrix.append(dataFrameResponse['Params'][i])
+    for j in range(len(dataFrameResponse)):
+        if dataFrameResponse[performance][j] == max_value:
+            model_matrix.append(class_model_save[j])
+            algorithm_data.append(dataFrameResponse['Algorithm'][j])
+            information_matrix.append(dataFrameResponse['Params'][j])
 
     array_summary = []
 
-    for i in range(len(information_matrix)):
-        model_data = {'algorithm': algorithm_data[i], 'params':information_matrix[i]}
+    for j in range(len(information_matrix)):
+        model_data = {'algorithm': algorithm_data[j], 'params':information_matrix[j]}
         array_summary.append(model_data)
 
     information_model.update({"models":array_summary})
 
     #export models
-    for i in range(len(model_matrix)):
-        name_model = path_output+"meta_models/"+performance+"_model"+str(i)+".joblib"
-        dump(model_matrix[i], name_model)
+    for j in range(len(model_matrix)):
+        name_model = path_output+"meta_models/"+performance+"_model"+str(j)+".joblib"
+        dump(model_matrix[j], name_model)
 
     dict_summary_meta_model.update({performance:information_model})
 
