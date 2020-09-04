@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import sys
 import argparse
 from sklearn import preprocessing
 import numpy as np
@@ -107,6 +106,7 @@ def main():
                 class_model_save.append(AdaBoostObject.model)
 
             except Exception as e:
+                print('error ada', e)
                 pass
 
     # Baggin
@@ -140,6 +140,7 @@ def main():
                 print(row)
                 class_model_save.append(bagginObject.model)
             except Exception as e:
+                print('error bootstrap', e)
                 pass
 
     # BernoulliNB
@@ -168,6 +169,7 @@ def main():
         class_model_save.append(bernoulliNB.model)
 
     except Exception as e:
+        print('error bernoulli', e)
         pass
 
     # DecisionTree
@@ -199,9 +201,8 @@ def main():
                 matrixResponse.append(row)
                 class_model_save.append(decisionTreeObject.model)
             except Exception as e:
+                print('error tree', e)
                 pass
-            break
-        break
 
     try:
         # GaussianNB
@@ -228,6 +229,7 @@ def main():
         matrixResponse.append(row)
         class_model_save.append(gaussianObject.model)
     except Exception as e:
+        print('error gaussian', e)
         pass
 
     # gradiente
@@ -261,10 +263,8 @@ def main():
                 matrixResponse.append(row)
                 class_model_save.append(gradientObject.model)
             except Exception as e:
+                print('erro gradiente', e)
                 pass
-
-            break
-        break
 
     # knn
     for n_neighbors in range(2, 11):
@@ -315,11 +315,8 @@ def main():
                         class_model_save.append(knnObect.model)
 
                     except Exception as e:
+                        print('error knn', e)
                         pass
-                    break
-                break
-            break
-        break
 
     # NuSVC
     for kernel in ["rbf", "linear", "poly", "sigmoid", "precomputed"]:
@@ -357,10 +354,9 @@ def main():
                     class_model_save.append(nuSVM.model)
 
                 except Exception as e:
+                    print('error nusvc', e)
                     pass
-                break
-            break
-        break
+
     # SVC
     for kernel in ["rbf", "linear", "poly", "sigmoid", "precomputed"]:
         for C_value in [0.01, 0.05, 0.1]:
@@ -397,10 +393,8 @@ def main():
                     class_model_save.append(svm.model)
 
                 except Exception as e:
+                    print('error svc', e)
                     pass
-                break
-            break
-        break
 
     # RF
     for n_estimators in [10, 100, 1000]:
@@ -442,6 +436,7 @@ def main():
                     matrixResponse.append(row)
                     class_model_save.append(rf.model)
                 except Exception as e:
+                    print('error rf', e)
                     pass
 
     # generamos el export de la matriz convirtiendo a data frame
@@ -510,9 +505,7 @@ def main():
 
         # export models
         for i in range(len(model_matrix)):
-            name_model = (
-                path.join(path_output, f"meta_models/{performance}_model{str(i)}.joblib")
-            )
+            name_model = path.join(path_output, f"meta_models/{performance}_model{str(i)}.joblib")
             dump(model_matrix[i], name_model)
 
         dict_summary_meta_model.update({performance: information_model})

@@ -8,6 +8,8 @@ from numpy.random import RandomState
 from os import path
 
 TEST_SIZE = 0.2
+SAMPLE_SEED = 51
+SPLIT_SEED = 42
 
 
 def main():
@@ -26,34 +28,24 @@ def main():
     dataset = pd.DataFrame(matrix_encoding_scaled)
     dataset.columns = [f"P_{i+1}" for i in range(len(dataset.columns))]
 
-    response_data = pd.read_csv(encode_dataset, header=None, sep=',').iloc[:, -1]
-
-    if args.mode == 'classification':
-        # Transform string labels to int
-        le = preprocessing.LabelEncoder()
-        le.fit(response_data)
-        response_encoded = le.transform(response_data)
-        dataset['response'] = response_encoded
-
-    elif args.mode == 'regression':
-        dataset['response'] = response_data
+    dataset['response'] = pd.read_csv(encode_dataset, header=None, sep=',').iloc[:, -1]
 
     # Save full dataset
     dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=False, float_format='%.5f')
 
     # Random sample the dataset
-    sample_dataset = dataset.sample(frac=sample_fraction, axis=0, random_state=RandomState(13))
+    sample_dataset = dataset.sample(frac=sample_fraction, axis=0, random_state=RandomState(SAMPLE_SEED))
     labels = sample_dataset['response']
     data = sample_dataset.drop(['response'], axis=1)
 
     # Split random sample into testing and training datasets
-    x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=TEST_SIZE)
+    x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=TEST_SIZE, random_state=RandomState(SPLIT_SEED))
     training_df = pd.concat([x_train, y_train], axis=1)
     testing_df = pd.concat([x_test, y_test], axis=1)
 
     # Save datasets
-    training_df.to_csv(path.join(args.output, "training_dataset.csv"), index=False, float_format='%.5f')
-    testing_df.to_csv(path.join(args.output, "testing_dataset.csv"), index=False, float_format='%.5f')
+    training_df.to_csv(path.join(args.output, "training_dataset.csv"), index=True, float_format='%.5f')
+    testing_df.to_csv(path.join(args.output, "testing_dataset.csv"), index=True, float_format='%.5f')
 
 
 def parse_arguments():
@@ -90,14 +82,6 @@ def parse_arguments():
         required=True,
         type=float,
         help="float number between [0,1] with the fraction of examples to use from the encoded dataset",
-    )
-
-    parser.add_argument(
-        "-m",
-        "--mode",
-        action="store",
-        choices=['regression', 'classification'],
-        help="Type of dataset {regression|classification}",
     )
 
     parser.add_argument(

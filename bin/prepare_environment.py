@@ -3,7 +3,7 @@
 import pandas as pd
 import sys
 import argparse
-
+from sklearn import preprocessing
 
 def main():
     args = parse_arguments()
@@ -11,24 +11,23 @@ def main():
     # read dataset and remove outliers
     print("Read csv file")
     dataset = pd.read_csv(args.input)
-    path_outout = sys.argv[2]
 
     print("Remove outliers")
     dataset_filter = dataset.dropna()
+
+    # Encode string labels to int
+    if args.mode == 'classification':
+        # Transform string labels to int
+        le = preprocessing.LabelEncoder()
+        le.fit(dataset['response'])
+        response_encoded = le.transform(dataset['response'])
+        dataset['response'] = response_encoded
+
+    elif args.mode == 'regression':
+        # Maybe add something here later
+        pass
+
     dataset_filter.to_csv(args.output, index=False)
-
-    """
-    print("Prepare paths")
-    
-    # create directory with different properties to use
-    list_propertyes = ["alpha-structure_group", "betha-structure_group", "energetic_group", "hydropathy_group", "hydrophobicity_group", "index_group", "secondary_structure_properties_group", "volume_group"]
-
-    for property_value in list_propertyes:
-        command = "mkdir -p %s%s" % (path_outout, property_value)
-        print(command)
-        os.system(command)
-    print("OK-Process")
-    """
 
 
 def parse_arguments():
@@ -46,6 +45,15 @@ def parse_arguments():
         action="store",
         required=True,
         help="csv file with the dataset, the file should have two columns 'sequence' and 'response'",
+    )
+
+    parser.add_argument(
+        "-m",
+        "--mode",
+        action="store",
+        required=True,
+        choices=['regression', 'classification'],
+        help="Type of dataset {regression|classification}",
     )
 
     parser.add_argument(

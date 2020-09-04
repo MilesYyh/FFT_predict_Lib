@@ -20,7 +20,7 @@ process prepare_dataset {
 
   script:
   """
-  prepare_environment.py -i $dataset_file -o ${dataset_file.simpleName}.no_nulls.csv
+  prepare_environment.py -i $dataset_file -o ${dataset_file.simpleName}.no_nulls.csv -m ${params.mode}
   """
 }
 
@@ -47,7 +47,7 @@ process encode_dataset_by_properties {
   encoding_dataset_using_properties.py -i $dataset -o . -e $encoding_file
   
   matlab nodisplay -nosplash -nodesktop -r \
-  "addpath('${params.bin}') ;procesFourierTransform('encoding_with_class.csv', '${fft_path}', '${domain_path}'); exit;"
+  "addpath('${params.bin}') ;procesFourierTransform('encoding_without_class.csv', '${fft_path}', '${domain_path}'); exit;"
   """
 }
 
@@ -64,7 +64,7 @@ process split_encoded_dataset {
 
   script:
   """
-  prepare_dataset_to_train_alt.py -i1 $dataset_class -i2 $dataset_fft -o . -s 0.5 -m ${params.mode}
+  prepare_dataset_to_train_alt.py -i1 $dataset_class -i2 $dataset_fft -o . -s 1.0
   """
 }
 
@@ -78,6 +78,7 @@ process training_dataset {
 
   output:
   path "*"
+  path ".command.log" 
 
   script:
   """
