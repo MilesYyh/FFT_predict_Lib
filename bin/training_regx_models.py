@@ -38,7 +38,7 @@ def estimatedStatisticPerformance(summaryObject, attribute):
 
 
 def main():
-    # TODO check script is working correct
+
     args = parse_arguments()
 
     dataset_training = pd.read_csv(args.input_1, index_col=0)
@@ -78,7 +78,7 @@ def main():
                 pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                 spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                 kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                r_score_value = performanceValues.calculateR_score()
+                r_score_value = performanceValues.calculateR2_score()
                 params = "loss:%s-n_estimators:%d" % (loss, n_estimators)
                 row = [
                     "AdaBoostClassifier",
@@ -112,7 +112,7 @@ def main():
                 pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                 spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                 kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                r_score_value = performanceValues.calculateR_score()
+                r_score_value = performanceValues.calculateR2_score()
                 params = "bootstrap:%s-n_estimators:%d" % (str(bootstrap), n_estimators)
                 row = [
                     "Bagging",
@@ -148,7 +148,7 @@ def main():
                 pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                 spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                 kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                r_score_value = performanceValues.calculateR_score()
+                r_score_value = performanceValues.calculateR2_score()
 
                 print(predictions_data)
                 print(response_testing)
@@ -194,7 +194,7 @@ def main():
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                     kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                    r_score_value = performanceValues.calculateR_score()
+                    r_score_value = performanceValues.calculateR2_score()
 
                     params = (
                         "criterion:%s-n_estimators:%d-loss:%s-min_samples_split:%d-min_samples_leaf:%d"
@@ -249,7 +249,7 @@ def main():
                         kendalltauValue = performanceValues.calculatekendalltau()[
                             "kendalltau"
                         ]
-                        r_score_value = performanceValues.calculateR_score()
+                        r_score_value = performanceValues.calculateR2_score()
 
                         params = "n_neighbors:%d-algorithm:%s-metric:%s-weights:%s" % (
                             n_neighbors,
@@ -291,7 +291,7 @@ def main():
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                     kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                    r_score_value = performanceValues.calculateR_score()
+                    r_score_value = performanceValues.calculateR2_score()
 
                     params = "kernel:%s-nu:%f-degree:%d-gamma:%f" % (
                         kernel,
@@ -330,7 +330,7 @@ def main():
                 pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                 spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                 kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                r_score_value = performanceValues.calculateR_score()
+                r_score_value = performanceValues.calculateR2_score()
 
                 params = "kernel:%s-degree:%d-gamma:%f" % (kernel, degree, 0.01)
                 row = [
@@ -373,7 +373,7 @@ def main():
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
                     kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-                    r_score_value = performanceValues.calculateR_score()
+                    r_score_value = performanceValues.calculateR2_score()
 
                     params = (
                         "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s"

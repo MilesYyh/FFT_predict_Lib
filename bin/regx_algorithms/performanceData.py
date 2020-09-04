@@ -15,7 +15,7 @@ class performancePrediction(object):
         self.realValues = realValues
         self.predictValues = predictValues
 
-    def calculateR_score(self):
+    def calculateR2_score(self):
 
         return r2_score(self.realValues, self.predictValues)
 

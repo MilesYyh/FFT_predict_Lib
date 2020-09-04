@@ -42,7 +42,7 @@ def estimatedStatisticPerformance(summaryObject, attribute):
 
 
 def main():
-    # TODO remove index when load dataset
+
     args = parse_arguments()
 
     dataset_training = pd.read_csv(args.input_1, index_col=0)

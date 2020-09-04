@@ -241,7 +241,7 @@ for n_estimators in [10,100, 1000]:
             pearsonValue = performanceValues.calculatedPearson()['pearsonr']
             spearmanValue = performanceValues.calculatedSpearman()['spearmanr']
             kendalltauValue = performanceValues.calculatekendalltau()['kendalltau']
-            r_score_value = performanceValues.calculateR_score()
+            r_score_value = performanceValues.calculateR2_score()
 
             params = "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s" % (n_estimators, criterion, 2, 1, str(bootstrap))
             row = ["RandomForestRegressor", params, r_score_value, pearsonValue, spearmanValue, kendalltauValue]
