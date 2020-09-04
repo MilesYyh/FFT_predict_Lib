@@ -51,7 +51,7 @@ def get_data_from_dataset(dataset):
 
 
 def main():
-
+    # TODO remove index when load dataset
     args = parse_arguments()
     dataset_training = pd.read_csv(args.input_1)
     dataset_testing = pd.read_csv(args.input_2)

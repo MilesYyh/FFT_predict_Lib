@@ -31,7 +31,7 @@ def main():
     dataset['response'] = pd.read_csv(encode_dataset, header=None, sep=',').iloc[:, -1]
 
     # Save full dataset
-    dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=False, float_format='%.5f')
+    dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=True, float_format='%.5f')
 
     # Random sample the dataset
     sample_dataset = dataset.sample(frac=sample_fraction, axis=0, random_state=RandomState(SAMPLE_SEED))
@@ -81,7 +81,7 @@ def parse_arguments():
         action="store",
         required=True,
         type=float,
-        help="float number between [0,1] with the fraction of examples to use from the encoded dataset",
+        help="float number between [0.0-1.0] with the fraction of examples to use from the encoded dataset",
     )
 
     parser.add_argument(

@@ -48,7 +48,6 @@ def get_response_from_dataset(name_doc):
     return response_array
 
 
-# TODO rework this script
 def main():
 
     args = parse_arguments()
@@ -95,7 +94,6 @@ def main():
     response_data_alt = pd.read_csv(name_doc_response, header=None, sep=',').iloc[:, -1]
     dataset_alt['response'] = response_data_alt
 
-    #TODO fix classes with label encoder in classification
 
     # Save full dataset
     dataset_alt.to_csv(path.join(args.output, "dataset_full.alt.csv"), index=False, float_format='%.5f')

@@ -25,19 +25,6 @@ import os
 from os import path
 
 
-def get_data_from_dataset(dataset):
-
-    matrix_data = []
-    for i in range(len(dataset)):
-        row = []
-        for key in dataset.keys():
-            if key != "response":
-                row.append(dataset[key][i])
-        matrix_data.append(row)
-
-    return matrix_data
-
-
 # funcion que permite calcular los estadisticos de un atributo en el set de datos, asociados a las medidas de desempeno
 def estimatedStatisticPerformance(summaryObject, attribute):
 
@@ -55,19 +42,19 @@ def estimatedStatisticPerformance(summaryObject, attribute):
 
 
 def main():
-
+    # TODO remove index when load dataset
     args = parse_arguments()
 
-    dataset_training = pd.read_csv(args.input_1)
-    dataset_testing = pd.read_csv(args.input_2)
+    dataset_training = pd.read_csv(args.input_1, index_col=0)
+    dataset_testing = pd.read_csv(args.input_2, index_col=0)
     path_output = args.output
 
     # split into dataset and class
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset = get_data_from_dataset(dataset_training)
-    matrix_dataset_testing = get_data_from_dataset(dataset_testing)
+    matrix_dataset = dataset_training.drop('response', axis=1)
+    matrix_dataset_testing = dataset_testing.drop('response', axis=1)
 
     # explore algorithms and combinations of hyperparameters
     # generamos una lista con los valores obtenidos...
@@ -489,24 +476,24 @@ def main():
         model_matrix = []
         algorithm_data = []
 
-        for i in range(len(dataFrameResponse)):
-            if dataFrameResponse[performance][i] == max_value:
-                model_matrix.append(class_model_save[i])
-                algorithm_data.append(dataFrameResponse["Algorithm"][i])
-                information_matrix.append(dataFrameResponse["Params"][i])
+        for j in range(len(dataFrameResponse)):
+            if dataFrameResponse[performance][j] == max_value:
+                model_matrix.append(class_model_save[j])
+                algorithm_data.append(dataFrameResponse['Algorithm'][j])
+                information_matrix.append(dataFrameResponse['Params'][j])
 
         array_summary = []
 
-        for i in range(len(information_matrix)):
-            model_data = {"algorithm": algorithm_data[i], "params": information_matrix[i]}
+        for j in range(len(information_matrix)):
+            model_data = {'algorithm': algorithm_data[j], 'params': information_matrix[j]}
             array_summary.append(model_data)
 
         information_model.update({"models": array_summary})
 
         # export models
-        for i in range(len(model_matrix)):
-            name_model = path.join(path_output, f"meta_models/{performance}_model{str(i)}.joblib")
-            dump(model_matrix[i], name_model)
+        for j in range(len(model_matrix)):
+            name_model = path.join(path_output, f"meta_models/{performance}_model{str(j)}.joblib")
+            dump(model_matrix[j], name_model)
 
         dict_summary_meta_model.update({performance: information_model})
 
