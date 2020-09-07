@@ -107,7 +107,7 @@ process test_models {
   script:
   """
   if [[ ${params.mode} == "classification" ]]; then
-    test_class_models.py -t $test_dataset -m $models -o ${encode}_test_results.csv
+    test_model.py -t $test_dataset -m $models -o ${encode}_test_results.csv
 
   elif [[ ${params.mode} == "regression" ]]; then
     echo "regx"
