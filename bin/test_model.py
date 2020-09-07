@@ -2,9 +2,23 @@
 
 import argparse
 import pandas as pd
+import numpy as np
 from joblib import dump, load
 from sklearn import preprocessing
 from os import path
+from tensorflow import keras
+
+
+def predict_class(model, eval_data):
+    """
+    Predict classes with tensorflow model using evaluation data
+    :param model: tensorflow model
+    :param eval_data: examples of data to classify
+    :return: list with predicted classes
+    """
+    prediction = model.predict(eval_data)
+
+    return [np.argmax(pred_probability) for pred_probability in prediction]
 
 
 def main():
@@ -21,17 +35,28 @@ def main():
     response_list = []
     index = []
 
-    try:
-        for model_path in model_list:
+    for model_path in model_list:
+        basename = path.basename(model_path)
+        root, ext = path.splitext(basename)
+        response_predict = None
+
+        if ext == '.joblib':
             model = load(model_path)
             response_predict = model.predict(validation_scaler)
-            response_list.append(response_predict)
-            index.append(path.basename(model_path))
 
-        df = pd.DataFrame(response_list, index=index)
-        df.to_csv(output, sep=',', index=True, float_format='%.5f')
-    except Exception as e:
-        print('Error: ', e)
+        elif ext == '.h5' and args.problem == 'classification':
+            model = keras.models.load_model(model_path)
+            response_predict = predict_class(model, validation_scaler)
+
+        elif ext == '.h5' and args.problem == 'regression':
+            # TODO load regression model
+            pass
+
+        response_list.append(response_predict)
+        index.append(basename)
+
+    df = pd.DataFrame(response_list, index=index)
+    df.to_csv(output, sep=',', index=True, float_format='%.5f')
 
 
 def parse_arguments():
@@ -67,6 +92,15 @@ def parse_arguments():
         "--encoding",
         action="store",
         help="encoding used on the input dataset",
+    )
+
+    parser.add_argument(
+        "-p",
+        "--problem",
+        action="store",
+        required=True,
+        choices=['regression', 'classification'],
+        help="type of problem {classification|regression}",
     )
 
     parser.add_argument(

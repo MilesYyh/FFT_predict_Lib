@@ -12,6 +12,7 @@ from class_algorithms import DecisionTree
 from class_algorithms import GaussianNB
 from class_algorithms import Gradient
 from class_algorithms import knn
+from class_algorithms.neural_network_class import NeuralNetwork
 from class_algorithms import NuSVM
 from class_algorithms import RandomForest
 from class_algorithms import SVM
@@ -19,16 +20,16 @@ from class_algorithms import responseTraining
 from class_algorithms import summaryStatistic
 from class_algorithms import performance_model
 
+
 from joblib import dump, load
 import json
-import os
 from os import path
 
 
 # funcion que permite calcular los estadisticos de un atributo en el set de datos, asociados a las medidas de desempeno
-def estimatedStatisticPerformance(summaryObject, attribute):
+def estimated_statistic_performance(summary_obj, attribute):
 
-    statistic = summaryObject.calculateValuesForColumn(attribute)
+    statistic = summary_obj.calculateValuesForColumn(attribute)
     row = [
         attribute,
         statistic["mean"],
@@ -39,6 +40,16 @@ def estimatedStatisticPerformance(summaryObject, attribute):
     ]
 
     return row
+
+
+def label_count(labels):
+    """
+    Count number of classes in label array
+    :param labels: array with classes
+    :return: dict with count of unique classes
+    """
+    unique, counts = np.unique(labels, return_counts=True)
+    return dict(zip(unique, counts))
 
 
 def main():
@@ -54,7 +65,7 @@ def main():
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset = dataset_training.drop('response', axis=1)
+    matrix_dataset_training = dataset_training.drop('response', axis=1)
     matrix_dataset_testing = dataset_testing.drop('response', axis=1)
 
     # explore algorithms and combinations of hyperparameters
@@ -70,13 +81,13 @@ def main():
             try:
                 print("Excec AdaBoost with ", algorithm, n_estimators)
                 AdaBoostObject = AdaBoost.AdaBoost(
-                    matrix_dataset, response_training, n_estimators, algorithm, 10
+                    matrix_dataset_training, response_training, n_estimators, algorithm, 10
                 )
                 AdaBoostObject.trainingMethod()
 
                 predictions = AdaBoostObject.model.predict(matrix_dataset_testing)
 
-                metrics = performance_model.performance_model(
+                metrics = performance_model.PerformanceModel(
                     response_testing, predictions.tolist()
                 )
                 metrics.get_performance()
@@ -103,14 +114,14 @@ def main():
             try:
                 print("Excec Bagging with ", bootstrap, n_estimators)
                 bagginObject = Baggin.Baggin(
-                    matrix_dataset, response_training, n_estimators, bootstrap, 10
+                    matrix_dataset_training, response_training, n_estimators, bootstrap, 10
                 )
 
                 bagginObject.trainingMethod()
                 params = "bootstrap:%s-n_estimators:%d" % (str(bootstrap), n_estimators)
 
                 predictions = bagginObject.model.predict(matrix_dataset_testing)
-                metrics = performance_model.performance_model(
+                metrics = performance_model.PerformanceModel(
                     response_testing, predictions.tolist()
                 )
                 metrics.get_performance()
@@ -133,12 +144,12 @@ def main():
 
     # BernoulliNB
     try:
-        bernoulliNB = BernoulliNB.Bernoulli(matrix_dataset, response_training, 10)
+        bernoulliNB = BernoulliNB.Bernoulli(matrix_dataset_training, response_training, 10)
         bernoulliNB.trainingMethod()
         print("Excec Bernoulli Default Params")
 
         predictions = bernoulliNB.model.predict(matrix_dataset_testing)
-        metrics = performance_model.performance_model(
+        metrics = performance_model.PerformanceModel(
             response_testing, predictions.tolist()
         )
         metrics.get_performance()
@@ -166,12 +177,12 @@ def main():
             try:
                 print("Excec DecisionTree with ", criterion, splitter)
                 decisionTreeObject = DecisionTree.DecisionTree(
-                    matrix_dataset, response_training, criterion, splitter, 10
+                    matrix_dataset_training, response_training, criterion, splitter, 10
                 )
                 decisionTreeObject.trainingMethod()
 
                 predictions = decisionTreeObject.model.predict(matrix_dataset_testing)
-                metrics = performance_model.performance_model(
+                metrics = performance_model.PerformanceModel(
                     response_testing, predictions.tolist()
                 )
                 metrics.get_performance()
@@ -194,13 +205,13 @@ def main():
 
     try:
         # GaussianNB
-        gaussianObject = GaussianNB.Gaussian(matrix_dataset, response_training, 10)
+        gaussianObject = GaussianNB.Gaussian(matrix_dataset_training, response_training, 10)
         gaussianObject.trainingMethod()
         print("Excec GaussianNB Default Params")
         params = "Default"
 
         predictions = gaussianObject.model.predict(matrix_dataset_testing)
-        metrics = performance_model.performance_model(
+        metrics = performance_model.PerformanceModel(
             response_testing, predictions.tolist()
         )
         metrics.get_performance()
@@ -226,7 +237,7 @@ def main():
             try:
                 print("Excec GradientBoostingClassifier with ", loss, n_estimators, 2, 1)
                 gradientObject = Gradient.Gradient(
-                    matrix_dataset, response_training, n_estimators, loss, 2, 1, 10
+                    matrix_dataset_training, response_training, n_estimators, loss, 2, 1, 10
                 )
                 gradientObject.trainingMethod()
                 params = (
@@ -235,7 +246,7 @@ def main():
                 )
 
                 predictions = gradientObject.model.predict(matrix_dataset_testing)
-                metrics = performance_model.performance_model(
+                metrics = performance_model.PerformanceModel(
                     response_testing, predictions.tolist()
                 )
                 metrics.get_performance()
@@ -268,7 +279,7 @@ def main():
                             weights,
                         )
                         knnObect = knn.knn(
-                            matrix_dataset,
+                            matrix_dataset_training,
                             response_training,
                             n_neighbors,
                             algorithm,
@@ -279,7 +290,7 @@ def main():
                         knnObect.trainingMethod()
 
                         predictions = knnObect.model.predict(matrix_dataset_testing)
-                        metrics = performance_model.performance_model(
+                        metrics = performance_model.PerformanceModel(
                             response_testing, predictions.tolist()
                         )
                         metrics.get_performance()
@@ -313,12 +324,12 @@ def main():
                 try:
                     print("Excec NuSVM")
                     nuSVM = NuSVM.NuSVM(
-                        matrix_dataset, response_training, kernel, nu, degree, 0.01, 10
+                        matrix_dataset_training, response_training, kernel, nu, degree, 0.01, 10
                     )
                     nuSVM.trainingMethod()
 
                     predictions = nuSVM.model.predict(matrix_dataset_testing)
-                    metrics = performance_model.performance_model(
+                    metrics = performance_model.PerformanceModel(
                         response_testing, predictions.tolist()
                     )
                     metrics.get_performance()
@@ -352,12 +363,12 @@ def main():
                 try:
                     print("Excec SVM")
                     svm = SVM.SVM(
-                        matrix_dataset, response_training, kernel, C_value, degree, 0.01, 10
+                        matrix_dataset_training, response_training, kernel, C_value, degree, 0.01, 10
                     )
                     svm.trainingMethod()
 
                     predictions = svm.model.predict(matrix_dataset_testing)
-                    metrics = performance_model.performance_model(
+                    metrics = performance_model.PerformanceModel(
                         response_testing, predictions.tolist()
                     )
                     metrics.get_performance()
@@ -391,7 +402,7 @@ def main():
                 try:
                     print("Excec RF")
                     rf = RandomForest.RandomForest(
-                        matrix_dataset,
+                        matrix_dataset_training,
                         response_training,
                         n_estimators,
                         criterion,
@@ -403,7 +414,7 @@ def main():
                     rf.trainingMethod()
 
                     predictions = rf.model.predict(matrix_dataset_testing)
-                    metrics = performance_model.performance_model(
+                    metrics = performance_model.PerformanceModel(
                         response_testing, predictions.tolist()
                     )
                     metrics.get_performance()
@@ -427,6 +438,41 @@ def main():
                     print('error rf', e)
                     pass
 
+    # Tensorflow neural network
+    for n_layers in [1, 2]:
+        for optimizer in ['Adam', 'RMSprop']:
+            for n_neurons in [64, 128]:
+                print(f"Neural network {n_layers}, {optimizer}, {n_neurons}")
+                try:
+                    n_features = len(matrix_dataset_training.columns)
+                    n_classes = len(label_count(pd.concat([response_training, response_testing])))
+
+                    nn_model = NeuralNetwork(n_features, n_classes, n_neurons, n_layers, optimizer=optimizer)
+                    nn_model.train_model(matrix_dataset_training, response_training)
+
+                    predictions = nn_model.predict(matrix_dataset_testing)
+                    metrics = performance_model.PerformanceModel(
+                        response_testing, predictions
+                    )
+                    metrics.get_performance()
+                    params = f"hidden_layers:{n_layers};n_neurons:{n_neurons};optimizer:{optimizer}"
+
+                    row = [
+                        "Fully Connected Neural Network",
+                        params,
+                        "CV-10",  # TODO check this value
+                        metrics.accuracy_value,
+                        metrics.recall_value,
+                        metrics.precision_value,
+                        metrics.f1_value,
+                    ]
+
+                    matrixResponse.append(row)
+                    class_model_save.append(nn_model)
+
+                except Exception as e:
+                    print('Error tensor ', e)
+
     # generamos el export de la matriz convirtiendo a data frame
     dataFrameResponse = pd.DataFrame(matrixResponse, columns=header)
 
@@ -438,10 +484,10 @@ def main():
     # instanciamos el object
     statisticObject = summaryStatistic.createStatisticSummary(nameFileExport)
 
-    matrixSummaryStatistic = [estimatedStatisticPerformance(statisticObject, "Accuracy"),
-                              estimatedStatisticPerformance(statisticObject, "Recall"),
-                              estimatedStatisticPerformance(statisticObject, "Precision"),
-                              estimatedStatisticPerformance(statisticObject, "F1")]
+    matrixSummaryStatistic = [estimated_statistic_performance(statisticObject, "Accuracy"),
+                              estimated_statistic_performance(statisticObject, "Recall"),
+                              estimated_statistic_performance(statisticObject, "Precision"),
+                              estimated_statistic_performance(statisticObject, "F1")]
 
     # "Accuracy", "Recall", "Precision", "Neg_log_loss", "F1", "FBeta"
 
@@ -489,9 +535,15 @@ def main():
         information_model.update({"models": array_summary})
 
         # export models
-        for j in range(len(model_matrix)):
-            name_model = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
-            dump(model_matrix[j], name_model)
+        for j, model in enumerate(model_matrix):
+            if type(model) == NeuralNetwork:
+                # Tensorflow cannot be pickle
+                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.h5")
+                model.model.save(save_path)
+
+            else:
+                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
+                dump(model, save_path)
 
         dict_summary_meta_model.update({performance: information_model})
 

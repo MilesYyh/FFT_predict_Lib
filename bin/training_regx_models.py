@@ -395,6 +395,7 @@ def main():
                 except Exception as e:
                     print('error rf', e)
                     pass
+    # TODO write neural net training loop
 
     matrixResponseRemove = []
     for element in matrixResponse:
@@ -461,6 +462,7 @@ def main():
         information_model.update({"models": array_summary})
 
         # export models
+        # TODO change save model loop
         for j in range(len(model_matrix)):
             name_model = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
             dump(model_matrix[j], name_model)

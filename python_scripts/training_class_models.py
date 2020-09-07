@@ -260,7 +260,7 @@ for n_estimators in [10,100,1000]:
                 rf.trainingMethod()
 
                 predictions = rf.model.predict(matrix_dataset_testing)
-                metrics = performance_model.performance_model(response_testing, predictions.tolist())
+                metrics = performance_model.PerformanceModel(response_testing, predictions.tolist())
                 metrics.get_performance()
 
                 params = "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s" % (n_estimators, criterion, 2, 1, str(bootstrap))

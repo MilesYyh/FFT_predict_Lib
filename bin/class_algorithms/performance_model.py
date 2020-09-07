@@ -4,10 +4,14 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 
 
-class performance_model(object):
+class PerformanceModel(object):
     def __init__(self, response_real, response_predict):
         self.response_real = response_real
         self.response_predict = response_predict
+        self.accuracy_value = None
+        self.f1_value = None
+        self.precision_value = None
+        self.recall_value = None
 
     def get_performance(self):
 

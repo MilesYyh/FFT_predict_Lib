@@ -75,7 +75,7 @@ process training_dataset {
   tag "${encode}"
   publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/", mode:"copy", pattern: "${encode}*.csv"
   publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/json/", mode:"copy", pattern: "*.json"
-  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/models/", mode:"copy", pattern: "*.joblib"
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/models/", mode:"copy", pattern: "{*.h5,*.joblib}"
 
   input:
   tuple val(encode), path(training_dataset), path(testing_dataset) from exploration_dataset_ch 
@@ -83,7 +83,7 @@ process training_dataset {
   output:
   path "*.csv"
   path "*.json"
-  tuple val(encode), path(testing_dataset), path("*.joblib") into models_ch
+  tuple val(encode), path(testing_dataset), path("{*.h5,*.joblib}") into models_ch
 
   script:
   """
@@ -108,7 +108,7 @@ process test_models {
   
   script:
   """
-  test_model.py -t $test_dataset -m $models -o ${encode}_test_results.csv
+  test_model.py -t $test_dataset -m $models -o ${encode}_test_results.csv -p ${params.mode}
   """
 }
 
