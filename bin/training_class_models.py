@@ -537,9 +537,9 @@ def main():
         # export models
         for j, model in enumerate(model_matrix):
             if type(model) == NeuralNetwork:
-                # Tensorflow cannot be pickle
+                # Tensorflow cannot be pickled
                 save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.h5")
-                model.model.save(save_path)
+                model.get_model().save(save_path)
 
             else:
                 save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")

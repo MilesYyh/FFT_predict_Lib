@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 import pandas as pd
 import argparse
 import numpy as np
@@ -11,6 +10,7 @@ from regx_algorithms import Baggin
 from regx_algorithms import DecisionTree
 from regx_algorithms import Gradient
 from regx_algorithms import knn_regression
+from regx_algorithms.neural_network_regx import NeuralNetwork
 from regx_algorithms import NuSVR
 from regx_algorithms import RandomForest
 from regx_algorithms import SVR
@@ -22,9 +22,9 @@ import json
 
 
 # funcion que permite calcular los estadisticos de un atributo en el set de datos, asociados a las medidas de desempeno
-def estimatedStatisticPerformance(summaryObject, attribute):
+def estimated_statistic_performance(summary_obj, attribute):
 
-    statistic = summaryObject.calculateValuesForColumn(attribute)
+    statistic = summary_obj.calculateValuesForColumn(attribute)
     row = [
         attribute,
         statistic["mean"],
@@ -50,7 +50,7 @@ def main():
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset = dataset_training.drop('response', axis=1)
+    matrix_dataset_training = dataset_training.drop('response', axis=1)
     matrix_dataset_testing = dataset_testing.drop('response', axis=1)
 
     # generamos una lista con los valores obtenidos...
@@ -61,13 +61,14 @@ def main():
 
     # comenzamos con las ejecuciones...
 
+    """
     # AdaBoost
     for loss in ["linear", "squar", "exponential"]:
         for n_estimators in [10, 100, 1000]:
             try:
                 print("Excec AdaBoostRegressor with ", loss, n_estimators)
                 AdaBoostObject = AdaBoost.AdaBoost(
-                    matrix_dataset, response_training, n_estimators, loss
+                    matrix_dataset_training, response_training, n_estimators, loss
                 )
                 AdaBoostObject.trainingMethod()
 
@@ -102,7 +103,7 @@ def main():
             try:
                 print("Excec Bagging with ", bootstrap, n_estimators)
                 bagginObject = Baggin.Baggin(
-                    matrix_dataset, response_training, n_estimators, bootstrap
+                    matrix_dataset_training, response_training, n_estimators, bootstrap
                 )
                 bagginObject.trainingMethod()
 
@@ -137,7 +138,7 @@ def main():
             try:
                 print("Excec DecisionTree with ", criterion, splitter)
                 decisionTreeObject = DecisionTree.DecisionTree(
-                    matrix_dataset, response_training, criterion, splitter
+                    matrix_dataset_training, response_training, criterion, splitter
                 )
                 decisionTreeObject.trainingMethod()
 
@@ -177,7 +178,7 @@ def main():
                 try:
                     print("Excec GradientBoostingRegressor with ", loss, n_estimators, 2, 1)
                     gradientObject = Gradient.Gradient(
-                        matrix_dataset,
+                        matrix_dataset_training,
                         response_training,
                         n_estimators,
                         loss,
@@ -231,7 +232,7 @@ def main():
                             weights,
                         )
                         knnObect = knn_regression.KNN_Model(
-                            matrix_dataset,
+                            matrix_dataset_training,
                             response_training,
                             n_neighbors,
                             algorithm,
@@ -281,7 +282,7 @@ def main():
                 try:
                     print("Excec NuSVM")
                     nuSVM = NuSVR.NuSVRModel(
-                        matrix_dataset, response_training, kernel, degree, 0.01, nu
+                        matrix_dataset_training, response_training, kernel, degree, 0.01, nu
                     )
                     nuSVM.trainingMethod()
                     predictions_data = nuSVM.model.predict(matrix_dataset_testing)
@@ -320,7 +321,7 @@ def main():
         for degree in range(3, 5):
             try:
                 print("Excec SVM")
-                svm = SVR.SVRModel(matrix_dataset, response_training, kernel, degree, 0.01)
+                svm = SVR.SVRModel(matrix_dataset_training, response_training, kernel, degree, 0.01)
                 svm.trainingMethod()
 
                 predictions_data = svm.model.predict(matrix_dataset_testing)
@@ -349,7 +350,7 @@ def main():
             except Exception as e:
                 print('error svc', e)
                 pass
-
+    
     # RF
     for n_estimators in [10, 100, 1000]:
         for criterion in ["mse", "mae"]:
@@ -357,7 +358,7 @@ def main():
                 try:
                     print("Excec RF")
                     rf = RandomForest.RandomForest(
-                        matrix_dataset,
+                        matrix_dataset_training,
                         response_training,
                         n_estimators,
                         criterion,
@@ -395,7 +396,37 @@ def main():
                 except Exception as e:
                     print('error rf', e)
                     pass
-    # TODO write neural net training loop
+    """
+    # TODO add parameter combinations for nn
+    try:
+        n_features = len(matrix_dataset_training.columns)
+        nn_model = NeuralNetwork(n_features, 64, 2)
+        nn_model.train_model(matrix_dataset_training, response_training)
+
+        predictions = nn_model.predict(matrix_dataset_testing)
+        performanceValues = performanceData.performancePrediction(response_testing.to_numpy(), predictions)
+
+        pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
+        spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
+        kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
+        r_score_value = performanceValues.calculateR2_score()
+
+        params = f"Params"
+
+        row = [
+            "Fully connected neural network",
+            params,
+            r_score_value,
+            pearsonValue,
+            spearmanValue,
+            kendalltauValue,
+        ]
+
+        matrixResponse.append(row)
+        regx_model_save.append(nn_model)
+
+    except Exception as e:
+        print("Error nn ", e)
 
     matrixResponseRemove = []
     for element in matrixResponse:
@@ -412,10 +443,10 @@ def main():
     # estimamos los estadisticos resumenes para cada columna en el header
     # instanciamos el object
     statisticObject = summaryStatistic.createStatisticSummary(nameFileExport)
-    matrixSummaryStatistic = [estimatedStatisticPerformance(statisticObject, "R_Score"),
-                              estimatedStatisticPerformance(statisticObject, "Pearson"),
-                              estimatedStatisticPerformance(statisticObject, "Spearman"),
-                              estimatedStatisticPerformance(statisticObject, "Kendalltau")]
+    matrixSummaryStatistic = [estimated_statistic_performance(statisticObject, "R_Score"),
+                              estimated_statistic_performance(statisticObject, "Pearson"),
+                              estimated_statistic_performance(statisticObject, "Spearman"),
+                              estimated_statistic_performance(statisticObject, "Kendalltau")]
 
     # generamos el nombre del archivo
     dataFrame = pd.DataFrame(
@@ -462,10 +493,15 @@ def main():
         information_model.update({"models": array_summary})
 
         # export models
-        # TODO change save model loop
-        for j in range(len(model_matrix)):
-            name_model = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
-            dump(model_matrix[j], name_model)
+        for j, model in enumerate(model_matrix):
+            if type(model) == NeuralNetwork:
+                # Tensorflow cannot be pickled
+                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.h5")
+                model.get_model().save(save_path)
+
+            else:
+                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
+                dump(model, save_path)
 
         dict_summary_meta_model.update({performance: information_model})
 

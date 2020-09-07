@@ -1,4 +1,3 @@
-import tensorflow as tf
 import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -18,20 +17,17 @@ class NeuralNetwork:
         :param metrics: list of tensorflow metrics
         """
 
-        if metrics is None:
-            metrics = ['accuracy']
         inputs = keras.Input(shape=(n_features,), name="features")
 
         assert 0 < n_layers < 3, "by now layers should be only 1 or 2"
 
-        if n_layers == 1:
-            x = layers.Dense(n_neurons, activation="relu", name="hidden_1")(inputs)
+        x = layers.Dense(n_neurons, activation="relu", name="hidden_1")(inputs)
 
-        elif n_layers == 2:
-            x = layers.Dense(n_neurons, activation="relu", name="hidden_1")(inputs)
+        if n_layers == 2:
             x = layers.Dense(n_neurons, activation="relu", name="hidden_2")(x)
 
         outputs = layers.Dense(n_classes, activation="softmax", name="predictions")(x)
+
         self.model = keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(optimizer=optimizer,
                            loss=loss,
@@ -70,3 +66,10 @@ class NeuralNetwork:
 
         prediction = self.model.predict(eval_data)
         return [np.argmax(pred_probability) for pred_probability in prediction]
+
+    def get_model(self):
+        """
+        Get tensorflow model
+        :return: tf model object
+        """
+        return self.model

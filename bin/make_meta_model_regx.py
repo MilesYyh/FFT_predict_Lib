@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import sys
-from joblib import dump, load
-from sklearn import preprocessing
-import glob
 import numpy as np
 import argparse
 from scipy.stats import pearsonr

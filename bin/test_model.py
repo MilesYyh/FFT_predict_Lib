@@ -3,7 +3,7 @@
 import argparse
 import pandas as pd
 import numpy as np
-from joblib import dump, load
+from joblib import load
 from sklearn import preprocessing
 from os import path
 from tensorflow import keras
@@ -21,6 +21,17 @@ def predict_class(model, eval_data):
     return [np.argmax(pred_probability) for pred_probability in prediction]
 
 
+def predict_regx(model, eval_data):
+    """
+    Predict values using trained model
+    :param model: tensorflow model
+    :param eval_data: data for evaluation with no label
+    :return: predicted label for data
+    """
+    return model.predict(eval_data).flatten()
+
+
+# TODO preguntar que es posible que se cargen multiples veces el mismo modelo afectando el analisis
 def main():
     args = parse_arguments()
     model_list = args.models
@@ -28,6 +39,7 @@ def main():
 
     # Load and scale dataset
     test_df = pd.read_csv(args.test_dataset, sep=',', index_col=0).drop('response', axis=1)
+    # TODO preguntar por que se escala en dataset, si ya fue escalado en prepare_dataset_to_train.py
     min_max_scaler = preprocessing.MinMaxScaler()
     validation_scaler = min_max_scaler.fit_transform(test_df)
 
@@ -49,8 +61,8 @@ def main():
             response_predict = predict_class(model, validation_scaler)
 
         elif ext == '.h5' and args.problem == 'regression':
-            # TODO load regression model
-            pass
+            model = keras.models.load_model(model_path)
+            response_predict = predict_regx(model, validation_scaler)
 
         response_list.append(response_predict)
         index.append(basename)
