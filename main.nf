@@ -60,33 +60,57 @@ process split_encoded_dataset {
 
   output:
   path "dataset_full.csv"
+  path "testing_response.csv" into test_response_ch
   tuple val(encode), path("training_dataset.csv"), path("testing_dataset.csv") into exploration_dataset_ch, exploration_dataset_ch2
 
   script:
   """
-  prepare_dataset_to_train_alt.py -i1 $dataset_class -i2 $dataset_fft -o . -s 1.0
+  prepare_dataset_to_train.py -i1 $dataset_class -i2 $dataset_fft -o . -s 1.0
   """
 }
 
 
 process training_dataset {
-  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/", mode:"copy"
   tag "${encode}"
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/", mode:"copy", pattern: "${encode}*.csv"
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/json/", mode:"copy", pattern: "*.json"
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/models/", mode:"copy", pattern: "*.joblib"
 
   input:
   tuple val(encode), path(training_dataset), path(testing_dataset) from exploration_dataset_ch 
 
   output:
-  path "*"
-  path ".command.log" 
+  path "*.csv"
+  path "*.json"
+  tuple val(encode), path(testing_dataset), path("*.joblib") into models_ch
 
   script:
   """
   if [[ ${params.mode} == "classification" ]]; then
-    training_class_models.py -i1 $training_dataset -i2 $testing_dataset -o .
+    training_class_models.py -i1 $training_dataset -i2 $testing_dataset -o . -e $encode
 
   elif [[ ${params.mode} == "regression" ]]; then
-    training_regx_models.py -i1 $training_dataset -i2 $testing_dataset -o .
+    training_regx_models.py -i1 $training_dataset -i2 $testing_dataset -o . -e $encode
+  fi
+  """
+}
+
+process test_models {
+  publishDir "${params.output_dir}/5-test_model_results/", mode:"copy"
+
+  input:
+  tuple val(encode), path(test_dataset), path(models) from models_ch
+
+  output:
+  path "${encode}_test_results.csv" into model_test_results_ch
+  
+  script:
+  """
+  if [[ ${params.mode} == "classification" ]]; then
+    test_class_models.py -t $test_dataset -m $models -o ${encode}_test_results.csv
+
+  elif [[ ${params.mode} == "regression" ]]; then
+    echo "regx"
   fi
   """
 }

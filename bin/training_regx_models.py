@@ -41,6 +41,7 @@ def main():
 
     args = parse_arguments()
 
+    encode = args.encoding
     dataset_training = pd.read_csv(args.input_1, index_col=0)
     dataset_testing = pd.read_csv(args.input_2, index_col=0)
     path_output = args.output
@@ -404,7 +405,7 @@ def main():
     dataFrameResponse = pd.DataFrame(matrixResponseRemove, columns=header)
 
     # generamos el nombre del archivo
-    nameFileExport = path.join(path_output, "summaryProcessJob.csv")
+    nameFileExport = path.join(path_output, f"{encode}_summaryProcessJob.csv")
     dataFrameResponse.to_csv(nameFileExport, index=False)
 
     # estimamos los estadisticos resumenes para cada columna en el header
@@ -420,15 +421,12 @@ def main():
         matrixSummaryStatistic,
         columns=["Performance", "Mean", "STD", "Variance", "MAX", "MIN"],
     )
-    nameFileExport = path.join(path_output, "statisticPerformance.csv")
+    nameFileExport = path.join(path_output, f"{encode}_statisticPerformance.csv")
     dataFrame.to_csv(nameFileExport, index=False)
 
     dict_summary_meta_model = {}
 
     print("Process extract models")
-    command = f"mkdir -p {path.join(path_output, 'meta_models')}"
-    print(command)
-    os.system(command)
 
     # get max value for each performance
     for i in range(len(dataFrame)):
@@ -464,14 +462,14 @@ def main():
 
         # export models
         for j in range(len(model_matrix)):
-            name_model = path.join(path_output, f"meta_models/{performance}_model{str(j)}.joblib")
+            name_model = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
             dump(model_matrix[j], name_model)
 
         dict_summary_meta_model.update({performance: information_model})
 
     # export summary JSON file
     print("Export summary into JSON file")
-    with open(path.join(path_output, "meta_models/summary_meta_models.json"), "w") as fp:
+    with open(path.join(path_output, f"{encode}_summary_meta_models.json"), "w") as fp:
         json.dump(dict_summary_meta_model, fp)
 
 
@@ -506,6 +504,7 @@ def parse_arguments():
         "-e",
         "--encoding",
         action="store",
+        required=True,
         help="encoding used on the input dataset",
     )
 
