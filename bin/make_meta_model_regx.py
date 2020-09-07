@@ -6,61 +6,91 @@ from joblib import dump, load
 from sklearn import preprocessing
 import glob
 import numpy as np
+import argparse
 from scipy.stats import pearsonr
 from scipy.stats import spearmanr
 from scipy.stats import kendalltau
 from sklearn.metrics import r2_score
 
-path_data = sys.argv[1]
 
-matrix_response = []
+def main():
 
-list_properties = ["alpha-structure_group", "betha-structure_group", "energetic_group", "hydropathy_group", "hydrophobicity_group", "index_group", "secondary_structure_properties_group", "volume_group"]
+    args = parse_arguments()
+    models_list = args.model_results
+    response_path = args.response
 
-for property_value in list_properties:
+    # Load models results
+    df = pd.concat([pd.read_csv(model_path, sep=',', index_col=0) for model_path in models_list])
+    matrix_response = df.to_numpy()
 
-	try:
-		print("Using models for ", property_value)
-		#read testing dataset
-		testing_dataset = pd.read_csv(path_data+property_value+"/testing_dataset.csv")	
-		testing_dataset = testing_dataset.drop(['response'], axis=1)
+    # Get actual response
+    response_original = pd.read_csv(response_path, sep=',', index_col=0)['response'].to_list()
 
-		#scale dataset
-		min_max_scaler = preprocessing.MinMaxScaler()
-		validation_scaler = min_max_scaler.fit_transform(testing_dataset)
+    # get mean response
+    response_predict_avg = []
 
-		#get all list of models in meta_models
-		list_models = glob.glob(path_data+property_value+"/meta_models/*.joblib")
+    for i in range(len(matrix_response[0])):
+        point = []
+        for j in range(len(matrix_response)):
+            point.append(matrix_response[j][i])
+        response_predict_avg.append(np.mean(point))
 
-		for model in list_models:
-			load_model = load(model)
-			response_predict = load_model.predict(validation_scaler)
-			row_response = []
-			for response in response_predict:
-				row_response.append(response)
-			matrix_response.append(row_response)
-	except:
-		pass
-#get actual response
-dataset_original = pd.read_csv(path_data+list_properties[0]+"/testing_dataset.csv")
-response_original = dataset_original['response']
+    # get performance compare real value v/s predicted value
+    pearson_value = pearsonr(response_original, response_predict_avg)
+    spearman_value = spearmanr(response_original, response_predict_avg)
+    kendalltau_value = kendalltau(response_original, response_predict_avg)
+    r2_score_value = r2_score(response_original, response_predict_avg)
 
-#get mean response
-response_predict_avg = []
+    print("Pearson: ", pearson_value)
+    print("Spearman: ", spearman_value)
+    print("Kendall: ", kendalltau_value)
+    print("R2 score: ", r2_score_value)
 
-for i in range(len(matrix_response[0])):
-	point=[]
-	for j in range(len(matrix_response)):
-		point.append(matrix_response[j][i])
-	response_predict_avg.append(np.mean(point))
 
-#get performance compare real value v/s predicted value
-pearson_value = pearsonr(response_original, response_predict_avg)[0]
-spearman_value = spearmanr(response_original, response_predict_avg)[0]
-kendalltau_value = kendalltau(response_original, response_predict_avg)[0]
-r2_score_value = r2_score(response_original, response_predict_avg)
+def parse_arguments():
+    """
+    Parse input arguments of script
 
-print("Pearson: ", pearson_value)
-print("Spearman: ", spearman_value)
-print("Kendall: ", kendalltau_value)
-print("R2 score: ", r2_score_value)
+    @return: arguments parser
+    """
+
+    parser = argparse.ArgumentParser(
+        "Script for regression meta model evaluation"
+    )
+
+    parser.add_argument(
+        "-m",
+        "--model-results",
+        action="store",
+        nargs='+',
+        required=True,
+        help="csv files with results from models",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--response",
+        action="store",
+        required=True,
+        help="csv with the original response of the model testing dataset",
+    )
+
+    parser.add_argument(
+        "-e",
+        "--encoding",
+        action="store",
+        help="encoding used on the input dataset",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        action="store",
+        help="output",
+    )
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    main()

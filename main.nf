@@ -51,6 +51,7 @@ process encode_dataset_by_properties {
   """
 }
 
+
 process split_encoded_dataset {
   tag "${encode}"
   publishDir "${params.output_dir}/3-datasets_for_exploration/${encode}/", mode:"copy"
@@ -95,6 +96,7 @@ process training_dataset {
   """
 }
 
+
 process test_models {
   publishDir "${params.output_dir}/5-test_model_results/", mode:"copy"
 
@@ -107,5 +109,28 @@ process test_models {
   script:
   """
   test_model.py -t $test_dataset -m $models -o ${encode}_test_results.csv
+  """
+}
+
+
+process meta_model_analysis {
+  publishDir "${params.output_dir}/6-meta_analysis/", mode:"copy"
+  echo true
+
+  input:
+  path model_results from model_test_results_ch.collect()
+  path response from test_response_ch.first()
+
+  output:
+  path "*"
+
+  script:
+  """
+  if [[ ${params.mode} == "classification" ]]; then
+    make_meta_model_class.py -r $response -m $model_results > out.txt
+
+  elif [[ ${params.mode} == "regression" ]]; then
+    make_meta_model_regx.py -r $response -m $model_results > out.txt
+  fi
   """
 }

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import pandas as pd
 import sys
 from joblib import dump, load
 from sklearn import preprocessing
 import glob
+import pandas as pd
 import argparse
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -14,42 +14,16 @@ from sklearn.metrics import recall_score
 
 
 def main():
-    path_data = sys.argv[1]
+    args = parse_arguments()
+    models_list = args.model_results
+    response_path = args.response
 
-    matrix_response = []
+    # Load models results
+    df = pd.concat([pd.read_csv(model_path, sep=',', index_col=0) for model_path in models_list])
+    matrix_response = df.to_numpy()
 
-    list_properties = ["alpha-structure_group", "betha-structure_group", "energetic_group", "hydropathy_group",
-                       "hydrophobicity_group", "index_group", "secondary_structure_properties_group", "volume_group"]
-
-    for property_value in list_properties:
-
-        print("Using models for ", property_value)
-        # read testing dataset
-        testing_dataset = pd.read_csv(path_data + property_value + "/testing_dataset.csv")
-        testing_dataset = testing_dataset.drop(['response'], axis=1)
-
-        # scale dataset
-        min_max_scaler = preprocessing.MinMaxScaler()
-        validation_scaler = min_max_scaler.fit_transform(testing_dataset)
-
-        # get all list of models in meta_models
-        list_models = glob.glob(path_data + property_value + "/meta_models/*.joblib")
-
-        try:
-            for model in list_models:
-                load_model = load(model)
-                response_predict = load_model.predict(validation_scaler)
-                row_response = []
-                for response in response_predict:
-                    row_response.append(response)
-                matrix_response.append(row_response)
-        except Exception as e:
-            print("Error ", e)
-            pass
-
-    # get actual response
-    dataset_original = pd.read_csv(path_data + list_properties[0] + "/testing_dataset.csv")
-    response_original = dataset_original['response']
+    # Get actual response
+    response_original = pd.read_csv(response_path, sep=',', index_col=0)['response'].to_list()
 
     # get mean response
     response_predict_voted = []
@@ -92,6 +66,51 @@ def main():
     print("Recall: ", recall_value)
     print("Precision: ", precision_value)
     print("F1 score: ", f1_value)
+
+
+def parse_arguments():
+    """
+    Parse input arguments of script
+
+    @return: arguments parser
+    """
+
+    parser = argparse.ArgumentParser(
+        "Script for classification meta model evaluation"
+    )
+
+    parser.add_argument(
+        "-m",
+        "--model-results",
+        action="store",
+        nargs='+',
+        required=True,
+        help="csv files with results from models",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--response",
+        action="store",
+        required=True,
+        help="csv with the original response of the model testing dataset",
+    )
+
+    parser.add_argument(
+        "-e",
+        "--encoding",
+        action="store",
+        help="encoding used on the input dataset",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        action="store",
+        help="output",
+    )
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':

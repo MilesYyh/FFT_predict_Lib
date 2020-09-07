@@ -29,7 +29,7 @@ def main():
             index.append(path.basename(model_path))
 
         df = pd.DataFrame(response_list, index=index)
-        df.to_csv(output, sep=',', index=True)
+        df.to_csv(output, sep=',', index=True, float_format='%.5f')
     except Exception as e:
         print('Error: ', e)
 
