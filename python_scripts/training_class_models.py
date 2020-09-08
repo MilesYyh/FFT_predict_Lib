@@ -251,7 +251,7 @@ for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
 
 '''
 #RF
-for n_estimators in [10,100,1000]:
+for n_estimators in [100]:
     for criterion in ['gini', 'entropy']:
         for bootstrap in [True, False]:
             try:
