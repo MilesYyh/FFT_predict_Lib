@@ -504,7 +504,7 @@ def main():
                     row = [
                         "Fully Connected Neural Network",
                         params,
-                        "CV-10",  # TODO check this value
+                        "None",  # TODO check this value
                         metrics.accuracy_value,
                         metrics.recall_value,
                         metrics.precision_value,

@@ -2,8 +2,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-# TODO write regex neural net class
-
 
 class NeuralNetwork:
     def __init__(
