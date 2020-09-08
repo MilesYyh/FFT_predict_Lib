@@ -4,8 +4,16 @@ from tensorflow.keras import layers
 
 
 class NeuralNetwork:
-    def __init__(self, n_features, n_classes, n_neurons, n_layers, optimizer='adam', loss='sparse_categorical_crossentropy',
-                 metrics=['accuracy']):
+    def __init__(
+        self,
+        n_features,
+        n_classes,
+        n_neurons,
+        n_layers,
+        optimizer="adam",
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    ):
         """
         Init tensorflow neural network model
         :param n_features: number of features in data
@@ -29,9 +37,7 @@ class NeuralNetwork:
         outputs = layers.Dense(n_classes, activation="softmax", name="predictions")(x)
 
         self.model = keras.Model(inputs=inputs, outputs=outputs)
-        self.model.compile(optimizer=optimizer,
-                           loss=loss,
-                           metrics=metrics)
+        self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     def train_model(self, train_data, train_labels, epochs=50, batch_size=128):
         """
@@ -43,12 +49,14 @@ class NeuralNetwork:
         :return: tensorflow history object
         """
 
-        return self.model.fit(train_data,
-                              train_labels,
-                              verbose=0,
-                              epochs=epochs,
-                              validation_split=0.2,
-                              batch_size=batch_size)
+        return self.model.fit(
+            train_data,
+            train_labels,
+            verbose=0,
+            epochs=epochs,
+            validation_split=0.2,
+            batch_size=batch_size,
+        )
 
     def test_model(self, test_data, test_labels):
         """

@@ -65,12 +65,20 @@ def main():
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset_training = dataset_training.drop('response', axis=1)
-    matrix_dataset_testing = dataset_testing.drop('response', axis=1)
+    matrix_dataset_training = dataset_training.drop("response", axis=1)
+    matrix_dataset_testing = dataset_testing.drop("response", axis=1)
 
     # explore algorithms and combinations of hyperparameters
     # generamos una lista con los valores obtenidos...
-    header = ["Algorithm", "Params", "Validation", "Accuracy", "Recall", "Precision", "F1"]
+    header = [
+        "Algorithm",
+        "Params",
+        "Validation",
+        "Accuracy",
+        "Recall",
+        "Precision",
+        "F1",
+    ]
     matrixResponse = []
 
     class_model_save = []
@@ -81,7 +89,11 @@ def main():
             try:
                 print("Excec AdaBoost with ", algorithm, n_estimators)
                 AdaBoostObject = AdaBoost.AdaBoost(
-                    matrix_dataset_training, response_training, n_estimators, algorithm, 10
+                    matrix_dataset_training,
+                    response_training,
+                    n_estimators,
+                    algorithm,
+                    10,
                 )
                 AdaBoostObject.trainingMethod()
 
@@ -105,7 +117,7 @@ def main():
                 class_model_save.append(AdaBoostObject.model)
 
             except Exception as e:
-                print('error ada', e)
+                print("error ada", e)
                 pass
 
     # Baggin
@@ -114,7 +126,11 @@ def main():
             try:
                 print("Excec Bagging with ", bootstrap, n_estimators)
                 bagginObject = Baggin.Baggin(
-                    matrix_dataset_training, response_training, n_estimators, bootstrap, 10
+                    matrix_dataset_training,
+                    response_training,
+                    n_estimators,
+                    bootstrap,
+                    10,
                 )
 
                 bagginObject.trainingMethod()
@@ -139,12 +155,14 @@ def main():
                 print(row)
                 class_model_save.append(bagginObject.model)
             except Exception as e:
-                print('error bootstrap', e)
+                print("error bootstrap", e)
                 pass
 
     # BernoulliNB
     try:
-        bernoulliNB = BernoulliNB.Bernoulli(matrix_dataset_training, response_training, 10)
+        bernoulliNB = BernoulliNB.Bernoulli(
+            matrix_dataset_training, response_training, 10
+        )
         bernoulliNB.trainingMethod()
         print("Excec Bernoulli Default Params")
 
@@ -168,7 +186,7 @@ def main():
         class_model_save.append(bernoulliNB.model)
 
     except Exception as e:
-        print('error bernoulli', e)
+        print("error bernoulli", e)
         pass
 
     # DecisionTree
@@ -200,12 +218,14 @@ def main():
                 matrixResponse.append(row)
                 class_model_save.append(decisionTreeObject.model)
             except Exception as e:
-                print('error tree', e)
+                print("error tree", e)
                 pass
 
     try:
         # GaussianNB
-        gaussianObject = GaussianNB.Gaussian(matrix_dataset_training, response_training, 10)
+        gaussianObject = GaussianNB.Gaussian(
+            matrix_dataset_training, response_training, 10
+        )
         gaussianObject.trainingMethod()
         print("Excec GaussianNB Default Params")
         params = "Default"
@@ -228,16 +248,24 @@ def main():
         matrixResponse.append(row)
         class_model_save.append(gaussianObject.model)
     except Exception as e:
-        print('error gaussian', e)
+        print("error gaussian", e)
         pass
 
     # gradiente
     for loss in ["deviance", "exponential"]:
         for n_estimators in [10, 100, 1000]:
             try:
-                print("Excec GradientBoostingClassifier with ", loss, n_estimators, 2, 1)
+                print(
+                    "Excec GradientBoostingClassifier with ", loss, n_estimators, 2, 1
+                )
                 gradientObject = Gradient.Gradient(
-                    matrix_dataset_training, response_training, n_estimators, loss, 2, 1, 10
+                    matrix_dataset_training,
+                    response_training,
+                    n_estimators,
+                    loss,
+                    2,
+                    1,
+                    10,
                 )
                 gradientObject.trainingMethod()
                 params = (
@@ -262,7 +290,7 @@ def main():
                 matrixResponse.append(row)
                 class_model_save.append(gradientObject.model)
             except Exception as e:
-                print('erro gradiente', e)
+                print("erro gradiente", e)
                 pass
 
     # knn
@@ -314,7 +342,7 @@ def main():
                         class_model_save.append(knnObect.model)
 
                     except Exception as e:
-                        print('error knn', e)
+                        print("error knn", e)
                         pass
 
     # NuSVC
@@ -324,7 +352,13 @@ def main():
                 try:
                     print("Excec NuSVM")
                     nuSVM = NuSVM.NuSVM(
-                        matrix_dataset_training, response_training, kernel, nu, degree, 0.01, 10
+                        matrix_dataset_training,
+                        response_training,
+                        kernel,
+                        nu,
+                        degree,
+                        0.01,
+                        10,
                     )
                     nuSVM.trainingMethod()
 
@@ -353,7 +387,7 @@ def main():
                     class_model_save.append(nuSVM.model)
 
                 except Exception as e:
-                    print('error nusvc', e)
+                    print("error nusvc", e)
                     pass
 
     # SVC
@@ -363,7 +397,13 @@ def main():
                 try:
                     print("Excec SVM")
                     svm = SVM.SVM(
-                        matrix_dataset_training, response_training, kernel, C_value, degree, 0.01, 10
+                        matrix_dataset_training,
+                        response_training,
+                        kernel,
+                        C_value,
+                        degree,
+                        0.01,
+                        10,
                     )
                     svm.trainingMethod()
 
@@ -392,7 +432,7 @@ def main():
                     class_model_save.append(svm.model)
 
                 except Exception as e:
-                    print('error svc', e)
+                    print("error svc", e)
                     pass
 
     # RF
@@ -435,19 +475,23 @@ def main():
                     matrixResponse.append(row)
                     class_model_save.append(rf.model)
                 except Exception as e:
-                    print('error rf', e)
+                    print("error rf", e)
                     pass
 
     # Tensorflow neural network
     for n_layers in [1, 2]:
-        for optimizer in ['Adam', 'RMSprop']:
+        for optimizer in ["Adam", "RMSprop"]:
             for n_neurons in [64, 128]:
                 print(f"Neural network {n_layers}, {optimizer}, {n_neurons}")
                 try:
                     n_features = len(matrix_dataset_training.columns)
-                    n_classes = len(label_count(pd.concat([response_training, response_testing])))
+                    n_classes = len(
+                        label_count(pd.concat([response_training, response_testing]))
+                    )
 
-                    nn_model = NeuralNetwork(n_features, n_classes, n_neurons, n_layers, optimizer=optimizer)
+                    nn_model = NeuralNetwork(
+                        n_features, n_classes, n_neurons, n_layers, optimizer=optimizer
+                    )
                     nn_model.train_model(matrix_dataset_training, response_training)
 
                     predictions = nn_model.predict(matrix_dataset_testing)
@@ -471,7 +515,7 @@ def main():
                     class_model_save.append(nn_model)
 
                 except Exception as e:
-                    print('Error tensor ', e)
+                    print("Error tensor ", e)
 
     # generamos el export de la matriz convirtiendo a data frame
     dataFrameResponse = pd.DataFrame(matrixResponse, columns=header)
@@ -484,10 +528,12 @@ def main():
     # instanciamos el object
     statisticObject = summaryStatistic.createStatisticSummary(nameFileExport)
 
-    matrixSummaryStatistic = [estimated_statistic_performance(statisticObject, "Accuracy"),
-                              estimated_statistic_performance(statisticObject, "Recall"),
-                              estimated_statistic_performance(statisticObject, "Precision"),
-                              estimated_statistic_performance(statisticObject, "F1")]
+    matrixSummaryStatistic = [
+        estimated_statistic_performance(statisticObject, "Accuracy"),
+        estimated_statistic_performance(statisticObject, "Recall"),
+        estimated_statistic_performance(statisticObject, "Precision"),
+        estimated_statistic_performance(statisticObject, "F1"),
+    ]
 
     # "Accuracy", "Recall", "Precision", "Neg_log_loss", "F1", "FBeta"
 
@@ -523,13 +569,16 @@ def main():
             difference_performance = abs(max_value - dataFrameResponse[performance][j])
             if difference_performance <= 0.000001:
                 model_matrix.append(class_model_save[j])
-                algorithm_data.append(dataFrameResponse['Algorithm'][j])
-                information_matrix.append(dataFrameResponse['Params'][j])
+                algorithm_data.append(dataFrameResponse["Algorithm"][j])
+                information_matrix.append(dataFrameResponse["Params"][j])
 
         array_summary = []
 
         for j in range(len(information_matrix)):
-            model_data = {'algorithm': algorithm_data[j], 'params': information_matrix[j]}
+            model_data = {
+                "algorithm": algorithm_data[j],
+                "params": information_matrix[j],
+            }
             array_summary.append(model_data)
 
         information_model.update({"models": array_summary})
@@ -538,11 +587,15 @@ def main():
         for j, model in enumerate(model_matrix):
             if type(model) == NeuralNetwork:
                 # Tensorflow cannot be pickled
-                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.h5")
+                save_path = path.join(
+                    path_output, f"{encode}_{performance}_model{str(j)}.h5"
+                )
                 model.get_model().save(save_path)
 
             else:
-                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
+                save_path = path.join(
+                    path_output, f"{encode}_{performance}_model{str(j)}.joblib"
+                )
                 dump(model, save_path)
 
         dict_summary_meta_model.update({performance: information_model})
@@ -599,5 +652,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -19,11 +19,15 @@ def main():
     response_path = args.response
 
     # Load models results
-    df = pd.concat([pd.read_csv(model_path, sep=',', index_col=0) for model_path in models_list])
+    df = pd.concat(
+        [pd.read_csv(model_path, sep=",", index_col=0) for model_path in models_list]
+    )
     matrix_response = df.to_numpy()
 
     # Get actual response
-    response_original = pd.read_csv(response_path, sep=',', index_col=0)['response'].to_list()
+    response_original = pd.read_csv(response_path, sep=",", index_col=0)[
+        "response"
+    ].to_list()
 
     # get mean response
     response_predict_voted = []
@@ -58,9 +62,13 @@ def main():
 
     # get performance compare real value v/s predicted value
     accuracy_value = accuracy_score(response_original, response_predict_voted)
-    f1_value = f1_score(response_original, response_predict_voted, average='weighted')
-    precision_value = precision_score(response_original, response_predict_voted, average='weighted')
-    recall_value = recall_score(response_original, response_predict_voted, average='weighted')
+    f1_value = f1_score(response_original, response_predict_voted, average="weighted")
+    precision_value = precision_score(
+        response_original, response_predict_voted, average="weighted"
+    )
+    recall_value = recall_score(
+        response_original, response_predict_voted, average="weighted"
+    )
 
     print("Accuracy: ", accuracy_value)
     print("Recall: ", recall_value)
@@ -75,15 +83,13 @@ def parse_arguments():
     @return: arguments parser
     """
 
-    parser = argparse.ArgumentParser(
-        "Script for classification meta model evaluation"
-    )
+    parser = argparse.ArgumentParser("Script for classification meta model evaluation")
 
     parser.add_argument(
         "-m",
         "--model-results",
         action="store",
-        nargs='+',
+        nargs="+",
         required=True,
         help="csv files with results from models",
     )
@@ -113,5 +119,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

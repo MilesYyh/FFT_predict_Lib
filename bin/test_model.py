@@ -38,7 +38,9 @@ def main():
     output = args.output
 
     # Load and scale dataset
-    test_df = pd.read_csv(args.test_dataset, sep=',', index_col=0).drop('response', axis=1)
+    test_df = pd.read_csv(args.test_dataset, sep=",", index_col=0).drop(
+        "response", axis=1
+    )
     # TODO preguntar por que se escala en dataset, si ya fue escalado en prepare_dataset_to_train.py
     min_max_scaler = preprocessing.MinMaxScaler()
     validation_scaler = min_max_scaler.fit_transform(test_df)
@@ -52,15 +54,15 @@ def main():
         root, ext = path.splitext(basename)
         response_predict = None
 
-        if ext == '.joblib':
+        if ext == ".joblib":
             model = load(model_path)
             response_predict = model.predict(validation_scaler)
 
-        elif ext == '.h5' and args.problem == 'classification':
+        elif ext == ".h5" and args.problem == "classification":
             model = keras.models.load_model(model_path)
             response_predict = predict_class(model, validation_scaler)
 
-        elif ext == '.h5' and args.problem == 'regression':
+        elif ext == ".h5" and args.problem == "regression":
             model = keras.models.load_model(model_path)
             response_predict = predict_regx(model, validation_scaler)
 
@@ -68,7 +70,7 @@ def main():
         index.append(basename)
 
     df = pd.DataFrame(response_list, index=index)
-    df.to_csv(output, sep=',', index=True, float_format='%.5f')
+    df.to_csv(output, sep=",", index=True, float_format="%.5f")
 
 
 def parse_arguments():
@@ -94,7 +96,7 @@ def parse_arguments():
         "-m",
         "--models",
         action="store",
-        nargs='+',
+        nargs="+",
         required=True,
         help="1 or more models saved as .joblib file",
     )
@@ -111,7 +113,7 @@ def parse_arguments():
         "--problem",
         action="store",
         required=True,
-        choices=['regression', 'classification'],
+        choices=["regression", "classification"],
         help="type of problem {classification|regression}",
     )
 
@@ -126,5 +128,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

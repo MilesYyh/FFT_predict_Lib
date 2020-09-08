@@ -16,6 +16,7 @@ from regx_algorithms import RandomForest
 from regx_algorithms import SVR
 from regx_algorithms import performanceData
 from class_algorithms import summaryStatistic
+from tensorflow import keras
 from joblib import dump, load
 from os import path
 import json
@@ -50,8 +51,8 @@ def main():
     response_training = dataset_training["response"]
     response_testing = dataset_testing["response"]
 
-    matrix_dataset_training = dataset_training.drop('response', axis=1)
-    matrix_dataset_testing = dataset_testing.drop('response', axis=1)
+    matrix_dataset_training = dataset_training.drop("response", axis=1)
+    matrix_dataset_testing = dataset_testing.drop("response", axis=1)
 
     # generamos una lista con los valores obtenidos...
     header = ["Algorithm", "Params", "R_Score", "Pearson", "Spearman", "Kendalltau"]
@@ -61,7 +62,6 @@ def main():
 
     # comenzamos con las ejecuciones...
 
-    """
     # AdaBoost
     for loss in ["linear", "squar", "exponential"]:
         for n_estimators in [10, 100, 1000]:
@@ -94,7 +94,7 @@ def main():
                 regx_model_save.append(AdaBoostObject.model)
 
             except Exception as e:
-                print('error ada', e)
+                print("error ada", e)
                 pass
 
     # Baggin
@@ -129,7 +129,7 @@ def main():
                 regx_model_save.append(bagginObject.model)
 
             except Exception as e:
-                print('error baggin', e)
+                print("error baggin", e)
                 pass
 
     # DecisionTree
@@ -142,7 +142,9 @@ def main():
                 )
                 decisionTreeObject.trainingMethod()
 
-                predictions_data = decisionTreeObject.model.predict(matrix_dataset_testing)
+                predictions_data = decisionTreeObject.model.predict(
+                    matrix_dataset_testing
+                )
 
                 performanceValues = performanceData.performancePrediction(
                     response_testing, predictions_data.tolist()
@@ -168,7 +170,7 @@ def main():
                 regx_model_save.append(decisionTreeObject.model)
 
             except Exception as e:
-                print('error tree', e)
+                print("error tree", e)
                 pass
 
     # gradiente
@@ -176,7 +178,13 @@ def main():
         for criterion in ["friedman_mse", "mse", "mae"]:
             for n_estimators in [10, 100, 1000]:
                 try:
-                    print("Excec GradientBoostingRegressor with ", loss, n_estimators, 2, 1)
+                    print(
+                        "Excec GradientBoostingRegressor with ",
+                        loss,
+                        n_estimators,
+                        2,
+                        1,
+                    )
                     gradientObject = Gradient.Gradient(
                         matrix_dataset_training,
                         response_training,
@@ -188,14 +196,18 @@ def main():
                     )
                     gradientObject.trainingMethod()
 
-                    predictions_data = gradientObject.model.predict(matrix_dataset_testing)
+                    predictions_data = gradientObject.model.predict(
+                        matrix_dataset_testing
+                    )
 
                     performanceValues = performanceData.performancePrediction(
                         response_testing, predictions_data.tolist()
                     )
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
-                    kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
+                    kendalltauValue = performanceValues.calculatekendalltau()[
+                        "kendalltau"
+                    ]
                     r_score_value = performanceValues.calculateR2_score()
 
                     params = (
@@ -215,7 +227,7 @@ def main():
                     regx_model_save.append(gradientObject.model)
 
                 except Exception as e:
-                    print('error gradiente', e)
+                    print("error gradiente", e)
                     pass
 
     # knn
@@ -241,13 +253,17 @@ def main():
                         )
                         knnObect.trainingMethod()
 
-                        predictions_data = knnObect.model.predict(matrix_dataset_testing)
+                        predictions_data = knnObect.model.predict(
+                            matrix_dataset_testing
+                        )
 
                         performanceValues = performanceData.performancePrediction(
                             response_testing, predictions_data.tolist()
                         )
                         pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
-                        spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
+                        spearmanValue = performanceValues.calculatedSpearman()[
+                            "spearmanr"
+                        ]
                         kendalltauValue = performanceValues.calculatekendalltau()[
                             "kendalltau"
                         ]
@@ -272,7 +288,7 @@ def main():
                         regx_model_save.append(knnObect.model)
 
                     except Exception as e:
-                        print('error knn', e)
+                        print("error knn", e)
                         pass
 
     # NuSVR
@@ -282,7 +298,12 @@ def main():
                 try:
                     print("Excec NuSVM")
                     nuSVM = NuSVR.NuSVRModel(
-                        matrix_dataset_training, response_training, kernel, degree, 0.01, nu
+                        matrix_dataset_training,
+                        response_training,
+                        kernel,
+                        degree,
+                        0.01,
+                        nu,
                     )
                     nuSVM.trainingMethod()
                     predictions_data = nuSVM.model.predict(matrix_dataset_testing)
@@ -292,7 +313,9 @@ def main():
                     )
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
-                    kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
+                    kendalltauValue = performanceValues.calculatekendalltau()[
+                        "kendalltau"
+                    ]
                     r_score_value = performanceValues.calculateR2_score()
 
                     params = "kernel:%s-nu:%f-degree:%d-gamma:%f" % (
@@ -313,7 +336,7 @@ def main():
                     regx_model_save.append(nuSVM.model)
 
                 except Exception as e:
-                    print('error nusvr', e)
+                    print("error nusvr", e)
                     pass
 
     # SVC
@@ -321,7 +344,9 @@ def main():
         for degree in range(3, 5):
             try:
                 print("Excec SVM")
-                svm = SVR.SVRModel(matrix_dataset_training, response_training, kernel, degree, 0.01)
+                svm = SVR.SVRModel(
+                    matrix_dataset_training, response_training, kernel, degree, 0.01
+                )
                 svm.trainingMethod()
 
                 predictions_data = svm.model.predict(matrix_dataset_testing)
@@ -348,9 +373,9 @@ def main():
                 regx_model_save.append(svm.model)
 
             except Exception as e:
-                print('error svc', e)
+                print("error svc", e)
                 pass
-    
+
     # RF
     for n_estimators in [10, 100, 1000]:
         for criterion in ["mse", "mae"]:
@@ -374,7 +399,9 @@ def main():
                     )
                     pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
                     spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
-                    kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
+                    kendalltauValue = performanceValues.calculatekendalltau()[
+                        "kendalltau"
+                    ]
                     r_score_value = performanceValues.calculateR2_score()
 
                     params = (
@@ -394,39 +421,48 @@ def main():
                     regx_model_save.append(rf.model)
 
                 except Exception as e:
-                    print('error rf', e)
+                    print("error rf", e)
                     pass
-    """
-    # TODO add parameter combinations for nn
-    try:
-        n_features = len(matrix_dataset_training.columns)
-        nn_model = NeuralNetwork(n_features, 64, 2)
-        nn_model.train_model(matrix_dataset_training, response_training)
 
-        predictions = nn_model.predict(matrix_dataset_testing)
-        performanceValues = performanceData.performancePrediction(response_testing.to_numpy(), predictions)
+    # TODO can't test multiple parameters, save fuction throws and error
+    for n_layers in [1]:
+        for n_neurons in [128]:
+            for activation in ["relu"]:
+                try:
+                    n_features = len(matrix_dataset_training.columns)
+                    nn_model = NeuralNetwork(
+                        n_features, n_neurons, n_layers, activation=activation
+                    )
+                    nn_model.train_model(matrix_dataset_training, response_training)
 
-        pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
-        spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
-        kendalltauValue = performanceValues.calculatekendalltau()["kendalltau"]
-        r_score_value = performanceValues.calculateR2_score()
+                    predictions = nn_model.predict(matrix_dataset_testing)
+                    performanceValues = performanceData.performancePrediction(
+                        response_testing.to_numpy(), predictions
+                    )
 
-        params = f"Params"
+                    pearsonValue = performanceValues.calculatedPearson()["pearsonr"]
+                    spearmanValue = performanceValues.calculatedSpearman()["spearmanr"]
+                    kendalltauValue = performanceValues.calculatekendalltau()[
+                        "kendalltau"
+                    ]
+                    r_score_value = performanceValues.calculateR2_score()
 
-        row = [
-            "Fully connected neural network",
-            params,
-            r_score_value,
-            pearsonValue,
-            spearmanValue,
-            kendalltauValue,
-        ]
+                    params = f"Params"
 
-        matrixResponse.append(row)
-        regx_model_save.append(nn_model)
+                    row = [
+                        "Fully connected neural network",
+                        params,
+                        r_score_value,
+                        pearsonValue,
+                        spearmanValue,
+                        kendalltauValue,
+                    ]
 
-    except Exception as e:
-        print("Error nn ", e)
+                    matrixResponse.append(row)
+                    regx_model_save.append(nn_model)
+
+                except Exception as e:
+                    print("Error nn ", e)
 
     matrixResponseRemove = []
     for element in matrixResponse:
@@ -443,10 +479,12 @@ def main():
     # estimamos los estadisticos resumenes para cada columna en el header
     # instanciamos el object
     statisticObject = summaryStatistic.createStatisticSummary(nameFileExport)
-    matrixSummaryStatistic = [estimated_statistic_performance(statisticObject, "R_Score"),
-                              estimated_statistic_performance(statisticObject, "Pearson"),
-                              estimated_statistic_performance(statisticObject, "Spearman"),
-                              estimated_statistic_performance(statisticObject, "Kendalltau")]
+    matrixSummaryStatistic = [
+        estimated_statistic_performance(statisticObject, "R_Score"),
+        estimated_statistic_performance(statisticObject, "Pearson"),
+        estimated_statistic_performance(statisticObject, "Spearman"),
+        estimated_statistic_performance(statisticObject, "Kendalltau"),
+    ]
 
     # generamos el nombre del archivo
     dataFrame = pd.DataFrame(
@@ -463,8 +501,8 @@ def main():
     # get max value for each performance
     for i in range(len(dataFrame)):
 
-        max_value = dataFrame['MAX'][i]
-        performance = dataFrame['Performance'][i]
+        max_value = dataFrame["MAX"][i]
+        performance = dataFrame["Performance"][i]
 
         print("MAX ", max_value, "Performance: ", performance)
         information_model = {}
@@ -481,13 +519,16 @@ def main():
             difference_performance = abs(max_value - dataFrameResponse[performance][j])
             if difference_performance <= 0.000001:
                 model_matrix.append(regx_model_save[j])
-                algorithm_data.append(dataFrameResponse['Algorithm'][j])
-                information_matrix.append(dataFrameResponse['Params'][j])
+                algorithm_data.append(dataFrameResponse["Algorithm"][j])
+                information_matrix.append(dataFrameResponse["Params"][j])
 
         array_summary = []
 
         for j in range(len(information_matrix)):
-            model_data = {'algorithm': algorithm_data[j], 'params': information_matrix[j]}
+            model_data = {
+                "algorithm": algorithm_data[j],
+                "params": information_matrix[j],
+            }
             array_summary.append(model_data)
 
         information_model.update({"models": array_summary})
@@ -496,11 +537,15 @@ def main():
         for j, model in enumerate(model_matrix):
             if type(model) == NeuralNetwork:
                 # Tensorflow cannot be pickled
-                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.h5")
-                model.get_model().save(save_path)
+                save_path = path.join(
+                    path_output, f"{encode}_{performance}_model{str(j)}.h5"
+                )
+                model.get_model().save(save_path, overwrite=True)
 
             else:
-                save_path = path.join(path_output, f"{encode}_{performance}_model{str(j)}.joblib")
+                save_path = path.join(
+                    path_output, f"{encode}_{performance}_model{str(j)}.joblib"
+                )
                 dump(model, save_path)
 
         dict_summary_meta_model.update({performance: information_model})
@@ -557,5 +602,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

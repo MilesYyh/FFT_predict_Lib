@@ -5,6 +5,7 @@ import sys
 import argparse
 from sklearn import preprocessing
 
+
 def main():
     args = parse_arguments()
 
@@ -16,14 +17,14 @@ def main():
     dataset_filter = dataset.dropna()
 
     # Encode string labels to int
-    if args.mode == 'classification':
+    if args.mode == "classification":
         # Transform string labels to int
         le = preprocessing.LabelEncoder()
-        le.fit(dataset['response'])
-        response_encoded = le.transform(dataset['response'])
-        dataset['response'] = response_encoded
+        le.fit(dataset["response"])
+        response_encoded = le.transform(dataset["response"])
+        dataset["response"] = response_encoded
 
-    elif args.mode == 'regression':
+    elif args.mode == "regression":
         # Maybe add something here later
         pass
 
@@ -52,7 +53,7 @@ def parse_arguments():
         "--mode",
         action="store",
         required=True,
-        choices=['regression', 'classification'],
+        choices=["regression", "classification"],
         help="Type of dataset {regression|classification}",
     )
 

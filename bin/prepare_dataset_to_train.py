@@ -21,32 +21,44 @@ def main():
     fft_file = args.input_2
 
     # Load data
-    matrix_encoding = pd.read_csv(fft_file, sep=',', header=None)
+    matrix_encoding = pd.read_csv(fft_file, sep=",", header=None)
     min_max_scaler = preprocessing.MinMaxScaler()
     matrix_encoding_scaled = min_max_scaler.fit_transform(matrix_encoding)
 
     dataset = pd.DataFrame(matrix_encoding_scaled)
     dataset.columns = [f"P_{i+1}" for i in range(len(dataset.columns))]
 
-    dataset['response'] = pd.read_csv(encode_dataset, header=None, sep=',').iloc[:, -1]
+    dataset["response"] = pd.read_csv(encode_dataset, header=None, sep=",").iloc[:, -1]
 
     # Save full dataset
-    dataset.to_csv(path.join(args.output, "dataset_full.csv"), index=True, float_format='%.5f')
+    dataset.to_csv(
+        path.join(args.output, "dataset_full.csv"), index=True, float_format="%.5f"
+    )
 
     # Random sample the dataset
-    sample_dataset = dataset.sample(frac=sample_fraction, axis=0, random_state=RandomState(SAMPLE_SEED))
-    labels = sample_dataset['response']
-    data = sample_dataset.drop(['response'], axis=1)
+    sample_dataset = dataset.sample(
+        frac=sample_fraction, axis=0, random_state=RandomState(SAMPLE_SEED)
+    )
+    labels = sample_dataset["response"]
+    data = sample_dataset.drop(["response"], axis=1)
 
     # Split random sample into testing and training datasets
-    x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=TEST_SIZE, random_state=RandomState(SPLIT_SEED))
+    x_train, x_test, y_train, y_test = train_test_split(
+        data, labels, test_size=TEST_SIZE, random_state=RandomState(SPLIT_SEED)
+    )
     training_df = pd.concat([x_train, y_train], axis=1)
     testing_df = pd.concat([x_test, y_test], axis=1)
 
     # Save datasets
-    training_df.to_csv(path.join(args.output, "training_dataset.csv"), index=True, float_format='%.5f')
-    testing_df.to_csv(path.join(args.output, "testing_dataset.csv"), index=True, float_format='%.5f')
-    testing_df['response'].to_csv(path.join(args.output, "testing_response.csv"), index=True, float_format='%.5f')
+    training_df.to_csv(
+        path.join(args.output, "training_dataset.csv"), index=True, float_format="%.5f"
+    )
+    testing_df.to_csv(
+        path.join(args.output, "testing_dataset.csv"), index=True, float_format="%.5f"
+    )
+    testing_df["response"].to_csv(
+        path.join(args.output, "testing_response.csv"), index=True, float_format="%.5f"
+    )
 
 
 def parse_arguments():

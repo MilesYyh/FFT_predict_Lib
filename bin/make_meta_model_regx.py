@@ -16,11 +16,15 @@ def main():
     response_path = args.response
 
     # Load models results
-    df = pd.concat([pd.read_csv(model_path, sep=',', index_col=0) for model_path in models_list])
+    df = pd.concat(
+        [pd.read_csv(model_path, sep=",", index_col=0) for model_path in models_list]
+    )
     matrix_response = df.to_numpy()
 
     # Get actual response
-    response_original = pd.read_csv(response_path, sep=',', index_col=0)['response'].to_list()
+    response_original = pd.read_csv(response_path, sep=",", index_col=0)[
+        "response"
+    ].to_list()
 
     # get mean response
     response_predict_avg = []
@@ -50,15 +54,13 @@ def parse_arguments():
     @return: arguments parser
     """
 
-    parser = argparse.ArgumentParser(
-        "Script for regression meta model evaluation"
-    )
+    parser = argparse.ArgumentParser("Script for regression meta model evaluation")
 
     parser.add_argument(
         "-m",
         "--model-results",
         action="store",
-        nargs='+',
+        nargs="+",
         required=True,
         help="csv files with results from models",
     )
@@ -88,5 +90,5 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
