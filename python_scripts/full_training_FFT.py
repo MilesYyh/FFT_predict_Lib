@@ -22,9 +22,9 @@ for property_data in list_properties:
 
 	command=""
 	if type_response == 1:#class
-		command = "python training_class_models.py %s %s" % (dataset_training, dataset_testing, path_response)
+		command = "python training_class_models.py %s %s %s" % (dataset_training, dataset_testing, path_response)
 	else:
-		command = "python training_regx_models.py %s %s" % (dataset_training, dataset_testing, path_response)
+		command = "python training_regx_models.py %s %s %s" % (dataset_training, dataset_testing, path_response)
 
 	print(command)
 	os.system(command)

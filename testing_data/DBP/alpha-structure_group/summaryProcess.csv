@@ -1,0 +1,2 @@
+Algorithm,Params,Validation,Accuracy,Recall,Precision,F1
+RandomForestClassifier,n_estimators:10-criterion:gini-min_samples_split:2-min_samples_leaf:1-bootstrap:True,CV-10,0.9767441860465116,0.9767441860465116,0.9777380242496523,0.9767088190609864

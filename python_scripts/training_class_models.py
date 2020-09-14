@@ -251,7 +251,7 @@ for kernel in ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed']:
 
 '''
 #RF
-for n_estimators in [10,100,1000]:
+for n_estimators in [100]:
     for criterion in ['gini', 'entropy']:
         for bootstrap in [True, False]:
             try:
@@ -260,7 +260,7 @@ for n_estimators in [10,100,1000]:
                 rf.trainingMethod()
 
                 predictions = rf.model.predict(matrix_dataset_testing)
-                metrics = performance_model.PerformanceModel(response_testing, predictions.tolist())
+                metrics = performance_model.performance_model(response_testing, predictions.tolist())
                 metrics.get_performance()
 
                 params = "n_estimators:%d-criterion:%s-min_samples_split:%d-min_samples_leaf:%d-bootstrap:%s" % (n_estimators, criterion, 2, 1, str(bootstrap))
@@ -322,7 +322,7 @@ for i in range(len(dataFrame)):
     for j in range(len(dataFrameResponse)):
         print("Performance model: ", dataFrameResponse[performance][j])
         difference_performance = abs(max_value - dataFrameResponse[performance][j])        
-        if difference_performance <= 0.000001:
+        if difference_performance<= 0.000001:
             model_matrix.append(class_model_save[j])
             algorithm_data.append(dataFrameResponse['Algorithm'][j])
             information_matrix.append(dataFrameResponse['Params'][j])

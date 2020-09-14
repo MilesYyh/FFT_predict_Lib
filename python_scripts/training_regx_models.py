@@ -237,6 +237,10 @@ for n_estimators in [10,100, 1000]:
             rf.trainingMethod()
 
             predictions_data = rf.model.predict(matrix_dataset_testing)
+            array_data = [x for x in predictions_data]
+            print(array_data)
+            array_data = [x for x in response_testing]
+            print(array_data)
             performanceValues = performanceData.performancePrediction(response_testing, predictions_data.tolist())
             pearsonValue = performanceValues.calculatedPearson()['pearsonr']
             spearmanValue = performanceValues.calculatedSpearman()['spearmanr']
