@@ -1,5 +1,34 @@
 ## README
 
+## REQUIREMENTS
+1. Anaconda or Miniconda
+2. MATLAB (R2018n used on our tests)
+
+## HOW TO RUN
+Create enviroment with conda
+```shell script
+conda env create -f env.yml
+```
+
+Activate conda env
+```shell script
+conda activate fft_predict
+```
+
+Modifify the next string values on `nextflow.config`
+```shell script
+dataset_path = "path/to/dataset.file"
+output_dir =  "path/to/output/"
+mode = "type_of_dataset" // {classification|regression}
+cpus = n_cpus // number of cpus to use
+```
+
+Run the workflow
+```shell script
+nextflow run main.nf -resume
+```
+
+
 ## WORKFLOW
 
 ## 1. PREPARE ENVIRONMENT
