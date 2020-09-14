@@ -1,7 +1,7 @@
 ## README
 
 ## REQUIREMENTS
-1. Anaconda or Miniconda
+1. [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 2. MATLAB (R2018n used on our tests)
 
 ## HOW TO RUN
