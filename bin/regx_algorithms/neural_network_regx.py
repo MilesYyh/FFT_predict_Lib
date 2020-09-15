@@ -1,6 +1,13 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import tarfile
+import os.path
+
+
+def make_tarfile(output_filename, source_dir):
+    with tarfile.open(output_filename, "w:gz") as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 
 class NeuralNetwork:
@@ -24,18 +31,36 @@ class NeuralNetwork:
         :param metrics: list of tensorflow metrics
         """
 
-        inputs = keras.Input(shape=(n_features,), name="features")
-        x = layers.Dense(n_neurons, activation=activation, name="hidden_1")(inputs)
-
         assert 0 < n_layers < 3, "by now layers should be only 1 or 2"
 
-        if n_layers == 2:
-            x = layers.Dense(n_neurons, activation=activation, name="hidden_2")(x)
+        if n_layers == 1:
+            self.model = keras.Sequential(
+                [
+                    layers.Dense(
+                        n_neurons,
+                        activation=activation,
+                        name="hidden_1",
+                        input_shape=[n_features],
+                    ),
+                    layers.Dense(1, name="output"),
+                ]
+            )
 
-        outputs = layers.Dense(1, name="predictions")(x)
+        elif n_layers == 2:
+            self.model = keras.Sequential(
+                [
+                    layers.Dense(
+                        n_neurons,
+                        activation=activation,
+                        name="hidden_1",
+                        input_shape=[n_features],
+                    ),
+                    layers.Dense(n_neurons, activation=activation, name="hidden_2"),
+                    layers.Dense(1, name="output"),
+                ]
+            )
 
-        self.model = keras.Model(inputs=inputs, outputs=outputs)
-        self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+        self.model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
     def train_model(self, train_data, train_labels, epochs=50, batch_size=128):
         """
@@ -77,3 +102,13 @@ class NeuralNetwork:
         :return: tf model object
         """
         return self.model
+
+    def save_model(self, path, overwrite=True):
+        """
+        Save model
+        :param path: path to save
+        :param overwrite: overwrite file
+        """
+
+        self.model.save(path, overwrite=overwrite)
+        make_tarfile(path + ".tar", path)

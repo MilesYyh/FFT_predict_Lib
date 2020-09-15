@@ -3,6 +3,7 @@
 import argparse
 import pandas as pd
 import numpy as np
+import tarfile
 from joblib import load
 from sklearn import preprocessing
 from os import path
@@ -62,8 +63,12 @@ def main():
             model = keras.models.load_model(model_path)
             response_predict = predict_class(model, validation_scaler)
 
-        elif ext == ".h5" and args.problem == "regression":
-            model = keras.models.load_model(model_path)
+        elif ext == ".tar" and args.problem == "regression":
+            tf = tarfile.open(model_path)
+            tf.extractall()
+            tf.close()
+
+            model = keras.models.load_model(root)
             response_predict = predict_regx(model, validation_scaler)
 
         response_list.append(response_predict)

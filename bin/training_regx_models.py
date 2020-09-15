@@ -424,10 +424,9 @@ def main():
                     print("error rf", e)
                     pass
 
-    # TODO can't test multiple parameters, save fuction throws and error
-    for n_layers in [1]:
-        for n_neurons in [128]:
-            for activation in ["relu"]:
+    for n_layers in [1, 2]:
+        for n_neurons in [64, 128, 256]:
+            for activation in ["relu", "sigmoid"]:
                 try:
                     n_features = len(matrix_dataset_training.columns)
                     nn_model = NeuralNetwork(
@@ -538,9 +537,9 @@ def main():
             if type(model) == NeuralNetwork:
                 # Tensorflow cannot be pickled
                 save_path = path.join(
-                    path_output, f"{encode}_{performance}_model{str(j)}.h5"
+                    path_output, f"{encode}_{performance}_model{str(j)}"
                 )
-                model.get_model().save(save_path, overwrite=True)
+                model.save_model(save_path, overwrite=True)
 
             else:
                 save_path = path.join(

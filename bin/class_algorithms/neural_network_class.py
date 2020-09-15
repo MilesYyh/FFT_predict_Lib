@@ -81,3 +81,11 @@ class NeuralNetwork:
         :return: tf model object
         """
         return self.model
+
+    def save_model(self, path, overwrite=True):
+        """
+        Save tensorflow model
+        :param path: path to save
+        :param overwrite: overwrite file
+        """
+        self.model.save(path, overwrite=overwrite)

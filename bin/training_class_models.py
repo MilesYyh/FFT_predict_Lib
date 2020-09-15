@@ -590,7 +590,7 @@ def main():
                 save_path = path.join(
                     path_output, f"{encode}_{performance}_model{str(j)}.h5"
                 )
-                model.get_model().save(save_path)
+                model.save_model(save_path)
 
             else:
                 save_path = path.join(
