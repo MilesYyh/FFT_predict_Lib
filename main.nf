@@ -75,7 +75,7 @@ process training_dataset {
   tag "${encode}"
   publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/", mode:"copy", pattern: "${encode}*.csv"
   publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/json/", mode:"copy", pattern: "*.json"
-  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/models/", mode:"copy", pattern: "{*.h5,*.joblib,*tar}"
+  publishDir "${params.output_dir}/4-algorithms_exploration/${encode}/models/", mode:"copy", pattern: "{*.h5,*.joblib,*.tar}"
 
   input:
   tuple val(encode), path(training_dataset), path(testing_dataset) from exploration_dataset_ch 
