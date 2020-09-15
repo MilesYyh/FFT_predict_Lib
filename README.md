@@ -25,9 +25,10 @@ cpus = n_cpus // number of cpus to use
 
 Run the workflow
 ```shell script
-nextflow run main.nf -resume
+nextflow run main.nf -resume -with-report [file name]
 ```
-
+`-with-report [file name]`: creates an html file with information about execution\
+`-resume`: use cached output of process to continue the execution of the pipeline
 
 ## WORKFLOW
 
