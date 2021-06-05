@@ -1,0 +1,20 @@
+graph finite_state_machine {
+	rankdir=LR size="8,5"
+	node [shape=doublecircle]
+	"ILE-60"
+	node [shape=circle]
+	"VAL-40"
+	"MET-42"
+	"ILE-61"
+	"THR-73"
+	"ILE-60" -- "VAL-40" [label=0.722]
+	"ILE-60" -- "MET-42" [label=0.533]
+	"ILE-61" -- "THR-73" [label=0.780]
+	"ILE-60" -- "ILE-61" [label=5.9 style=dashed]
+	"ILE-60" -- "THR-73" [label=5.4 style=dashed]
+	"VAL-40" -- "MET-42" [label=6.6 style=dashed]
+	"VAL-40" -- "ILE-61" [label=9.6 style=dashed]
+	"VAL-40" -- "THR-73" [label=10.4 style=dashed]
+	"MET-42" -- "ILE-61" [label=6.2 style=dashed]
+	"MET-42" -- "THR-73" [label=10.7 style=dashed]
+}
