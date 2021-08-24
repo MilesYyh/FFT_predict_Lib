@@ -45,9 +45,7 @@ process encode_dataset_by_properties {
   domain_path="domain_data.csv"
   """
   encoding_dataset_using_properties.py -i $dataset -o . -e $encoding_file
-  
-  matlab nodisplay -nosplash -nodesktop -r \
-  "addpath('${params.bin}') ;procesFourierTransform('encoding_without_class.csv', '${fft_path}', '${domain_path}'); exit;"
+  processFourierTransform.py -i encoding_without_class.csv --spectral-output ${fft_path} --domain-output ${domain_path}
   """
 }
 

@@ -8,3 +8,4 @@ FFT_predict_Lib-master
 *.py[cod]
 __pycache__/
 test*/
+nextflow.config
