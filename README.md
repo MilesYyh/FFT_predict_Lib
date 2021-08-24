@@ -1,5 +1,8 @@
-## README
+# README
 
+Predicting the effect of mutations in proteins is one of the most critical challenges in protein engineering; by knowing the effect a substitution of one (or several) residues in the protein's sequence has on its overall properties, could design a variant with a desirable function. New strategies and methodologies to create predictive models are continually being developed. However, those that claim to be general often do not reach adequate performance, and those that aim to a particular task improve their predictive performance at the cost of the method's generality. Moreover, these approaches typically require a particular decision to encode the amino acidic sequence, without an explicit methodological agreement in such endeavor. To address this issues, in this work, we applied clustering, embedding, and dimensionality reduction techniques to the AAIndex database to select meaningful combinations of physicochemical properties for the encoding stage. We then used the chosen set of properties to obtain several encodings of the same sequence, to subsequently apply the Fast Fourier Transform (FFT) on them. We perform an exploratory stage of Machine-Learning models in the frequency space, using different algorithms and hyperparameters. Finally, we select the best performing predictive models in each set of properties and create a synthetic assembled model. We extensively tested the proposed methodology on different datasets and demonstrated that the generated meta-model achieved notably better performance metrics than those models based on a single encoding, and -in most cases- than those reported. The proposed method is available as a Python library for non-commercial use under the GNU General Public License (GPLv3) license.
+
+[See our preprint!](https://www.researchgate.net/publication/344530124_Combination_of_digital_signal_processing_and_assembled_predictive_models_facilitates_the_rational_design_of_proteins)
 ## REQUIREMENTS
 1. [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
@@ -19,7 +22,6 @@ params {
     dataset_path = "path/to/dataset.file"
     output_dir = "path/to/output/"
     encoding_index_dir = "encoding_AAIndex/*"     
-    bin = "$PWD/bin/"
     mode = type_of_dataset"
 }
 
@@ -30,7 +32,7 @@ executor {
 ```
 
 
-Modify the next string values on `nextflow.config`
+Modify the next values on `nextflow.config`
 ```shell script
 dataset_path = "path/to/dataset.file"
 output_dir =  "path/to/output/"
@@ -44,9 +46,3 @@ nextflow run main.nf -resume -with-report [file name]
 ```
 `-with-report [file name]`: creates an html file with information about execution\
 `-resume`: use cached output of process to continue the execution of the pipeline
-
-## RECOMMENDATIONS
-
-## CASES OF STUDY
-
-## ABOUT US

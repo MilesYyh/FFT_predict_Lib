@@ -23,15 +23,17 @@ def main():
     for i in range(len(dataset_to_process)):
 
         # get a sequences
-        sequence_encoding = [dataset_to_process[key][i] for key in dataset_to_process.keys()]
+        sequence_encoding = [
+            dataset_to_process[key][i] for key in dataset_to_process.keys()
+        ]
         number_sample = len(sequence_encoding)
 
         # sample spacing
-        T = 1.0/float(number_sample)
-        x = np.linspace(0.0, number_sample*T, number_sample)
+        T = 1.0 / float(number_sample)
+        x = np.linspace(0.0, number_sample * T, number_sample)
         yf = fft(sequence_encoding)
-        xf = np.linspace(0.0, 1.0/(2.0*T), number_sample//2)
-        matrix_encoding.append(np.abs(yf[0:number_sample//2]))
+        xf = np.linspace(0.0, 1.0 / (2.0 * T), number_sample // 2)
+        matrix_encoding.append(np.abs(yf[0 : number_sample // 2]))
         domain_data.append(xf)
 
     encoding_dataset = pd.DataFrame(matrix_encoding)
@@ -43,9 +45,8 @@ def main():
 
 def parse_arguments():
 
-    parser = argparse.ArgumentParser(
-        "Apply fast fourier transform"
-    )
+    parser = argparse.ArgumentParser("Apply fast fourier transform")
+
     parser.add_argument(
         "-i",
         "--input",
